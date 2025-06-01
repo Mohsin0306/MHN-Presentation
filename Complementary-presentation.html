@@ -1,0 +1,1423 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Complementary Therapies in Nursing</title>
+    <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <script src="https://unpkg.com/framer-motion@10.16.4/dist/framer-motion.js"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=Poppins:wght@300;400;500;600;700&display=swap');
+        
+        :root {
+            --primary-gradient: linear-gradient(135deg, #e879f9, #818cf8);
+            --card-gradient: linear-gradient(to right bottom, rgba(255, 255, 255, 0.05), rgba(255, 255, 255, 0.02));
+            --glass-effect: rgba(255, 255, 255, 0.05);
+            --border-color: rgba(255, 255, 255, 0.1);
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: #1a1a2e;
+            color: white;
+            overflow: hidden;
+            margin: 0;
+            padding: 0;
+            height: 100vh;
+            width: 100vw;
+        }
+
+        .therapy-card {
+            background: var(--card-gradient);
+            backdrop-filter: blur(10px);
+            border: 1px solid var(--border-color);
+            border-radius: 24px;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            overflow: hidden;
+            transform-style: preserve-3d;
+            perspective: 1000px;
+        }
+
+        .therapy-card:hover {
+            transform: translateY(-5px) rotateX(5deg);
+            border-color: rgba(255, 255, 255, 0.2);
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.3);
+        }
+
+        .therapy-card::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: var(--primary-gradient);
+            opacity: 0;
+            transition: opacity 0.4s ease;
+            z-index: -1;
+            border-radius: inherit;
+        }
+
+        .therapy-card:hover::before {
+            opacity: 0.1;
+        }
+
+        .gradient-text {
+            background: var(--primary-gradient);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+
+        .glass-effect {
+            background: var(--glass-effect);
+            backdrop-filter: blur(10px);
+            border: 1px solid var(--border-color);
+            transition: all 0.3s ease;
+        }
+
+        .glass-effect:hover {
+            background: rgba(255, 255, 255, 0.08);
+            border-color: rgba(255, 255, 255, 0.2);
+        }
+
+        .modern-shadow {
+            box-shadow: 0 10px 30px -5px rgba(0, 0, 0, 0.3);
+        }
+
+        .hover-lift {
+            transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .hover-lift:hover {
+            transform: translateY(-2px);
+        }
+
+        .glow {
+            position: relative;
+        }
+
+        .glow::after {
+            content: '';
+            position: absolute;
+            inset: -1px;
+            background: var(--primary-gradient);
+            filter: blur(15px);
+            opacity: 0;
+            transition: opacity 0.3s ease;
+            z-index: -1;
+            border-radius: inherit;
+        }
+
+        .glow:hover::after {
+            opacity: 0.5;
+        }
+
+        .nav-dots {
+            display: flex;
+            gap: 8px;
+            padding: 8px;
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: 20px;
+            backdrop-filter: blur(5px);
+        }
+
+        .nav-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.2);
+            transition: all 0.3s ease;
+        }
+
+        .nav-dot.active {
+            background: var(--primary-gradient);
+            transform: scale(1.2);
+        }
+
+        @keyframes float {
+            0% { transform: translateY(0px); }
+            50% { transform: translateY(-10px); }
+            100% { transform: translateY(0px); }
+        }
+
+        .float {
+            animation: float 3s ease-in-out infinite;
+        }
+
+        .next-button {
+            position: fixed;
+            bottom: 2rem;
+            right: 2rem;
+            background: var(--primary-gradient);
+            padding: 1rem 2rem;
+            border-radius: 9999px;
+            border: none;
+            color: white;
+            font-weight: 500;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            transition: all 0.3s ease;
+            z-index: 50;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+        }
+
+        .next-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.2);
+        }
+
+        .next-button:active {
+            transform: translateY(0);
+        }
+
+        .finish-button {
+            background: linear-gradient(135deg, #10b981, #059669);
+        }
+    </style>
+</head>
+<body>
+    <div id="root"></div>
+    <script type="text/babel">
+        const { motion, AnimatePresence } = Motion;
+
+        function ComplementaryTherapies() {
+            const [currentSlide, setCurrentSlide] = React.useState(0);
+
+            const slides = [
+                {
+                    type: 'intro',
+                    title: 'Complementary Therapies',
+                    subtitle: 'in Nursing',
+                    description: 'A diverse range of healing modalities used alongside medical treatments, promoting physical, emotional, social, cultural, and spiritual aspects of patient health.'
+                },
+                {
+                    type: 'mind-body',
+                    title: 'Mind-Body Therapies',
+                    icon: 'ph-brain',
+                    color: '#e879f9',
+                    description: 'Therapies that focus on the connection between mental and physical health',
+                    items: [
+                        { 
+                            name: 'Meditation & Yoga',
+                            description: 'Practices that involve focusing attention to achieve relaxed awareness',
+                            image: 'https://images.unsplash.com/photo-1506126613408-eca07ce68773?auto=format&fit=crop&q=80&w=500',
+                            icon: 'ph-lotus'
+                        },
+                        {
+                            name: 'Guided Imagery',
+                            description: 'Using mental images to promote relaxation and healing',
+                            image: 'https://images.unsplash.com/photo-1502230831726-fe5549140034?auto=format&fit=crop&q=80&w=500',
+                            icon: 'ph-eye'
+                        },
+                        {
+                            name: 'Music Therapy',
+                            description: 'Using music to address physical, emotional, and social needs',
+                            image: 'https://images.unsplash.com/photo-1507838153414-b4b713384a76?auto=format&fit=crop&q=80&w=500',
+                            icon: 'ph-music-notes'
+                        },
+                        {
+                            name: 'Humor Therapy',
+                            description: 'Using Laughter to reduce stress and improve mood',
+                            image: 'https://images.unsplash.com/photo-1517242027094-631f8c218a0f?auto=format&fit=crop&q=80&w=500',
+                            icon: 'ph-smiley'
+                        }
+                    ]
+                },
+                {
+                    type: 'manipulative',
+                    title: 'Manipulative Therapies',
+                    icon: 'ph-hand-palm',
+                    description: 'Hands-on techniques that promote healing through physical manipulation',
+                    items: [
+                        {
+                            name: 'Massage Therapy',
+                            description: 'Systematic manipulation of soft tissues for relaxation and improved circulation',
+                            icon: 'ph-hands-clapping',
+                            image: 'https://images.unsplash.com/photo-1519823551278-64ac92734fb1?auto=format&fit=crop&q=80&w=500'
+                        },
+                        {
+                            name: 'Therapeutic Touch',
+                            description: 'Energy-based approach to healing through gentle touch and energy field interaction',
+                            icon: 'ph-sparkle',
+                            image: 'https://images.unsplash.com/photo-1600334089648-b0d9d3028eb2?auto=format&fit=crop&q=80&w=500'
+                        },
+                        {
+                            name: 'Reflexology',
+                            description: 'Pressure application to specific points on feet and hands to affect body systems',
+                            icon: 'ph-footprints',
+                            image: 'https://images.squarespace-cdn.com/content/v1/52de519de4b0e9abea4fccf1/1509467241105-RZIW9QO6U8U9EVA1BJR1/iStock-480392420-900x600.jpg?format=1500w'
+                        },
+                        {
+                            name: 'Chiropractic Care',
+                            description: 'Manual adjustment of the spine and joints to improve function and reduce pain',
+                            icon: 'ph-spine',
+                            image: 'https://images.unsplash.com/photo-1576091160550-2173dba999ef?auto=format&fit=crop&q=80&w=500'
+                        }
+                    ]
+                },
+                {
+                    type: 'energy',
+                    title: 'Energy Healing',
+                    description: 'Therapies that work with the body\'s energy fields to promote healing and wellness',
+                    background: 'https://images.unsplash.com/photo-1591343395902-1adcb454c4e2?auto=format&fit=crop&q=80&w=2670'
+                },
+                {
+                    type: 'benefits',
+                    title: 'Benefits & Research',
+                    description: 'Evidence-based outcomes and research findings supporting complementary therapies in nursing practice',
+                    background: 'https://images.unsplash.com/photo-1576091160399-112ba8d25d1d?auto=format&fit=crop&q=80&w=2670'
+                },
+                {
+                    type: 'success',
+                    title: 'Patient Success Stories',
+                    description: 'Real-world examples of how complementary therapies transform patient care and recovery',
+                    background: 'https://images.unsplash.com/photo-1559757148-5c350d0d3c56?auto=format&fit=crop&q=80&w=2670'
+                }
+            ];
+
+            const handleNext = () => {
+                if (currentSlide < slides.length - 1) {
+                    setCurrentSlide(prev => prev + 1);
+                } else {
+                    // Handle finish action
+                    handleFinish();
+                }
+            };
+
+            const handleFinish = () => {
+                // Trigger completion animation
+                const root = document.documentElement;
+                root.style.setProperty('--completion-color', '#10b981');
+                
+                // Show completion animation for 1 second then redirect
+                setTimeout(() => {
+                    window.location.href = 'Cultural.html';
+                }, 1000);
+            };
+
+            const renderSlide = (slide) => {
+                switch (slide.type) {
+                    case 'intro':
+                        return (
+                            <motion.div 
+                                className="max-w-7xl mx-auto text-center relative min-h-screen flex items-center justify-center"
+                                initial={{ opacity: 0 }}
+                                animate={{ opacity: 1 }}
+                            >
+                                {/* Modern Gradient Background */}
+                                <div className="absolute inset-0">
+                                    <div className="absolute inset-0 bg-gradient-to-br from-purple-900/20 via-indigo-900/20 to-fuchsia-900/20" />
+                                    <motion.div
+                                        className="absolute inset-0"
+                                        animate={{
+                                            background: [
+                                                'radial-gradient(circle at 0% 0%, rgba(232, 121, 249, 0.1) 0%, transparent 50%)',
+                                                'radial-gradient(circle at 100% 100%, rgba(129, 140, 248, 0.1) 0%, transparent 50%)',
+                                                'radial-gradient(circle at 0% 0%, rgba(232, 121, 249, 0.1) 0%, transparent 50%)',
+                                            ],
+                                        }}
+                                        transition={{
+                                            duration: 10,
+                                            repeat: Infinity,
+                                            ease: "easeInOut"
+                                        }}
+                                    />
+                                </div>
+
+                                {/* Animated Particles */}
+                                <motion.div className="absolute inset-0">
+                                    {[...Array(30)].map((_, i) => (
+                                        <motion.div
+                                            key={i}
+                                            className="absolute w-1 h-1 rounded-full bg-white/30"
+                                            style={{
+                                                left: `${Math.random() * 100}%`,
+                                                top: `${Math.random() * 100}%`,
+                                            }}
+                                            animate={{
+                                                scale: [0, 1, 0],
+                                                opacity: [0, 0.5, 0],
+                                                y: [0, -30, 0],
+                                            }}
+                                            transition={{
+                                                duration: 2 + Math.random() * 2,
+                                                repeat: Infinity,
+                                                delay: i * 0.1,
+                                            }}
+                                        />
+                                    ))}
+                                </motion.div>
+
+                                <div className="relative z-10 px-4">
+                                    <motion.div
+                                        className="space-y-12"
+                                        initial="hidden"
+                                        animate="visible"
+                                        variants={{
+                                            hidden: { opacity: 0 },
+                                            visible: {
+                                                opacity: 1,
+                                                transition: {
+                                                    staggerChildren: 0.3
+                                                }
+                                            }
+                                        }}
+                                    >
+                                        {/* Main Title */}
+                                        <motion.div
+                                            className="relative"
+                                            variants={{
+                                                hidden: { opacity: 0, y: 50 },
+                                                visible: { opacity: 1, y: 0 }
+                                            }}
+                                            transition={{
+                                                type: "spring",
+                                                stiffness: 100,
+                                                damping: 20
+                                            }}
+                                        >
+                                            <motion.h1 
+                                                className="text-8xl md:text-9xl font-playfair font-bold relative"
+                                                style={{
+                                                    background: 'linear-gradient(135deg, #e879f9 0%, #818cf8 100%)',
+                                                    WebkitBackgroundClip: 'text',
+                                                    WebkitTextFillColor: 'transparent',
+                                                    backgroundClip: 'text'
+                                                }}
+                                            >
+                                                {slide.title}
+                                                <motion.div
+                                                    className="absolute -inset-4 bg-gradient-to-r from-purple-500 to-indigo-500 opacity-20 blur-3xl -z-10"
+                                                    animate={{
+                                                        scale: [1, 1.1, 1],
+                                                        opacity: [0.2, 0.3, 0.2],
+                                                    }}
+                                                    transition={{
+                                                        duration: 4,
+                                                        repeat: Infinity,
+                                                        ease: "easeInOut"
+                                                    }}
+                                                />
+                                            </motion.h1>
+                                            
+                                            <motion.span 
+                                                className="text-6xl md:text-7xl block mt-4 relative"
+                                                style={{
+                                                    background: 'linear-gradient(135deg, #818cf8 0%, #c084fc 100%)',
+                                                    WebkitBackgroundClip: 'text',
+                                                    WebkitTextFillColor: 'transparent',
+                                                    backgroundClip: 'text'
+                                                }}
+                                            >
+                                                {slide.subtitle}
+                                            </motion.span>
+                                        </motion.div>
+
+                                        {/* Description */}
+                                        <motion.p 
+                                            className="text-2xl text-gray-300 max-w-4xl mx-auto leading-relaxed glass-effect p-6 rounded-2xl modern-shadow"
+                                            variants={{
+                                                hidden: { opacity: 0, y: 20 },
+                                                visible: { 
+                                                    opacity: 1, 
+                                                    y: 0,
+                                                    transition: {
+                                                        type: "spring",
+                                                        stiffness: 100,
+                                                        delay: 0.6
+                                                    }
+                                                }
+                                            }}
+                                        >
+                                            {slide.description}
+                                        </motion.p>
+
+                                        {/* Modern Scroll Indicator */}
+                                        <motion.div
+                                            className="absolute bottom-12 left-1/2 transform -translate-x-1/2"
+                                            animate={{
+                                                y: [0, 10, 0],
+                                            }}
+                                            transition={{
+                                                duration: 2,
+                                                repeat: Infinity,
+                                                ease: "easeInOut"
+                                            }}
+                                        >
+                                            <div className="w-6 h-10 rounded-full border-2 border-white/30 flex items-start justify-center p-2">
+                                                <motion.div
+                                                    className="w-1 h-1 bg-white rounded-full"
+                                                    animate={{
+                                                        y: [0, 12, 0],
+                                                    }}
+                                                    transition={{
+                                                        duration: 2,
+                                                        repeat: Infinity,
+                                                        ease: "easeInOut"
+                                                    }}
+                                                />
+                                            </div>
+                                        </motion.div>
+                                    </motion.div>
+                                </div>
+                            </motion.div>
+                        );
+                    
+                    case 'mind-body':
+                        return (
+                            <motion.div 
+                                className="h-screen w-screen flex flex-col justify-between p-8 relative"
+                                initial={{ opacity: 0 }}
+                                animate={{ opacity: 1 }}
+                            >
+                                {/* Background Image with Overlay */}
+                                <div className="absolute inset-0 -z-20">
+                                    <img 
+                                        src="https://images.unsplash.com/photo-1506126613408-eca07ce68773?auto=format&fit=crop&q=80&w=2670" 
+                                        className="w-full h-full object-cover opacity-10"
+                                        alt="Background"
+                                    />
+                                    <div className="absolute inset-0 bg-gradient-to-b from-[#1a1a2e]/80 via-[#1a1a2e] to-[#1a1a2e]/80" />
+                                </div>
+
+                                {/* Header Section */}
+                                <div className="text-center mb-8">
+                                    <motion.div
+                                        className="w-24 h-24 mx-auto mb-4 relative"
+                                        initial={{ scale: 0 }}
+                                        animate={{ scale: 1 }}
+                                        transition={{ type: "spring", stiffness: 100 }}
+                                    >
+                                        <div className="absolute inset-0 rounded-full bg-gradient-to-r from-purple-500/20 to-blue-500/20 blur-xl"></div>
+                                        <motion.div
+                                            className="absolute inset-0 rounded-full"
+                                            style={{
+                                                background: 'conic-gradient(from 0deg, rgba(232, 121, 249, 0.2), rgba(129, 140, 248, 0.2), rgba(232, 121, 249, 0.2))'
+                                            }}
+                                            animate={{ rotate: 360 }}
+                                            transition={{ duration: 20, repeat: Infinity, ease: "linear" }}
+                                        />
+                                        <div className="absolute inset-2 rounded-full bg-[#1a1a2e] flex items-center justify-center backdrop-blur-xl">
+                                            <motion.i 
+                                                className="ph ph-brain text-4xl text-purple-400"
+                                                animate={{
+                                                    scale: [1, 1.1, 1],
+                                                    rotate: [0, 5, -5, 0]
+                                                }}
+                                                transition={{
+                                                    duration: 3,
+                                                    repeat: Infinity,
+                                                    ease: "easeInOut"
+                                                }}
+                                            />
+                                        </div>
+                                    </motion.div>
+                                    
+                                    <motion.h2 
+                                        className="text-5xl font-playfair mb-3 bg-gradient-to-r from-purple-400 to-blue-400 bg-clip-text text-transparent"
+                                        initial={{ y: 30, opacity: 0 }}
+                                        animate={{ y: 0, opacity: 1 }}
+                                    >
+                                        Mind-Body Therapies
+                                    </motion.h2>
+                                    
+                                    <motion.p 
+                                        className="text-xl text-gray-400 max-w-3xl mx-auto leading-relaxed"
+                                        initial={{ y: 20, opacity: 0 }}
+                                        animate={{ y: 0, opacity: 1 }}
+                                        transition={{ delay: 0.2 }}
+                                    >
+                                        Therapies that focus on the connection between mental and physical health
+                                    </motion.p>
+                                </div>
+                                
+                                {/* Therapy Cards Grid */}
+                                <motion.div 
+                                    className="grid grid-cols-2 gap-6 px-4 max-w-6xl mx-auto flex-1"
+                                    variants={{
+                                        hidden: { opacity: 0 },
+                                        visible: {
+                                            opacity: 1,
+                                            transition: { staggerChildren: 0.2 }
+                                        }
+                                    }}
+                                    initial="hidden"
+                                    animate="visible"
+                                >
+                                    {slide.items.map((therapy, index) => (
+                                        <motion.div
+                                            key={therapy.name}
+                                            className="therapy-card group relative overflow-hidden h-[200px]"
+                                        >
+                                            {/* Card Background Image */}
+                                            <div className="absolute inset-0">
+                                                <div className="absolute inset-0 bg-gradient-to-b from-transparent via-[#1a1a2e]/50 to-[#1a1a2e] z-10"></div>
+                                                <motion.img
+                                                    src={therapy.image}
+                                                    alt={therapy.name}
+                                                    className="w-full h-full object-cover opacity-30"
+                                                    initial={{ scale: 1 }}
+                                                    whileHover={{ scale: 1.1 }}
+                                                    transition={{ duration: 0.5 }}
+                                                />
+                                            </div>
+
+                                            {/* Card Content */}
+                                            <div className="relative z-10 p-6 h-full flex flex-col">
+                                                <div className="flex items-center mb-3">
+                                                    <motion.div
+                                                        className="w-10 h-10 rounded-full bg-purple-500/10 flex items-center justify-center mr-3"
+                                                        whileHover={{ rotate: 360 }}
+                                                        transition={{ duration: 0.5 }}
+                                                    >
+                                                        <i className={`${therapy.icon} text-xl text-purple-400`}></i>
+                                                    </motion.div>
+                                                    <h3 className="text-xl font-semibold text-white">{therapy.name}</h3>
+                                                </div>
+                                                <p className="text-gray-300 text-sm flex-1">{therapy.description}</p>
+
+                                                {/* Hover Effect Overlay */}
+                                                <motion.div
+                                                    className="absolute inset-0 bg-gradient-to-r from-purple-500/10 to-blue-500/10"
+                                                    initial={{ opacity: 0 }}
+                                                    whileHover={{ opacity: 1 }}
+                                                    transition={{ duration: 0.3 }}
+                                                />
+                                            </div>
+
+                                            {/* Decorative Elements */}
+                                            <div className="absolute top-2 right-2 opacity-50">
+                                                <motion.div
+                                                    animate={{
+                                                        rotate: [0, 360]
+                                                    }}
+                                                    transition={{
+                                                        duration: 20,
+                                                        repeat: Infinity,
+                                                        ease: "linear"
+                                                    }}
+                                                >
+                                                    <i className="ph ph-sparkle text-lg text-purple-400"></i>
+                                                </motion.div>
+                                            </div>
+                                        </motion.div>
+                                    ))}
+                                </motion.div>
+
+                                {/* Progress Dots */}
+                                <div className="flex justify-center gap-2 mt-6">
+                                    <motion.div className="w-2 h-2 rounded-full bg-purple-500"></motion.div>
+                                    <motion.div className="w-2 h-2 rounded-full bg-purple-500/30"></motion.div>
+                                    <motion.div className="w-2 h-2 rounded-full bg-purple-500/30"></motion.div>
+                                </div>
+                            </motion.div>
+                        );
+                    case 'manipulative':
+                        return (
+                            <motion.div 
+                                className="h-screen w-screen flex flex-col justify-between p-8 relative"
+                                initial={{ opacity: 0 }}
+                                animate={{ opacity: 1 }}
+                            >
+                                {/* Background Image with Overlay */}
+                                <div className="absolute inset-0 -z-20">
+                                    <img 
+                                        src="https://images.unsplash.com/photo-1519823551278-64ac92734fb1?auto=format&fit=crop&q=80&w=2670" 
+                                        className="w-full h-full object-cover opacity-10"
+                                        alt="Background"
+                                    />
+                                    <div className="absolute inset-0 bg-gradient-to-b from-[#1a1a2e]/80 via-[#1a1a2e] to-[#1a1a2e]/80" />
+                                </div>
+
+                                {/* Header Section */}
+                                <div className="text-center mb-8">
+                                    <motion.div
+                                        className="w-24 h-24 mx-auto mb-4 relative"
+                                        initial={{ scale: 0 }}
+                                        animate={{ scale: 1 }}
+                                        transition={{ type: "spring", stiffness: 100 }}
+                                    >
+                                        <motion.div
+                                            className="absolute inset-0 rounded-full"
+                                            style={{
+                                                background: 'conic-gradient(from 0deg, rgba(96, 165, 250, 0.2), rgba(37, 99, 235, 0.2))',
+                                                filter: 'blur(8px)'
+                                            }}
+                                            animate={{ rotate: 360 }}
+                                            transition={{ duration: 10, repeat: Infinity, ease: "linear" }}
+                                        />
+                                        <div className="absolute inset-2 rounded-full bg-[#1a1a2e] flex items-center justify-center backdrop-blur-xl">
+                                            <motion.i 
+                                                className="ph ph-hand-palm text-4xl text-blue-400"
+                                                animate={{
+                                                    scale: [1, 1.2, 1],
+                                                    rotate: [0, -10, 0, 10, 0]
+                                                }}
+                                                transition={{
+                                                    duration: 4,
+                                                    repeat: Infinity,
+                                                    ease: "easeInOut"
+                                                }}
+                                            />
+                                        </div>
+                                    </motion.div>
+
+                                    <motion.h2 
+                                        className="text-5xl font-playfair mb-3 bg-gradient-to-r from-blue-400 to-blue-600 bg-clip-text text-transparent"
+                                        initial={{ y: 30, opacity: 0 }}
+                                        animate={{ y: 0, opacity: 1 }}
+                                    >
+                                        Manipulative Therapies
+                                    </motion.h2>
+
+                                    <motion.p 
+                                        className="text-xl text-gray-400 max-w-3xl mx-auto leading-relaxed"
+                                        initial={{ y: 20, opacity: 0 }}
+                                        animate={{ y: 0, opacity: 1 }}
+                                        transition={{ delay: 0.2 }}
+                                    >
+                                        Hands-on techniques that promote healing through physical manipulation
+                                    </motion.p>
+                                </div>
+
+                                {/* Therapy Cards */}
+                                <motion.div 
+                                    className="grid grid-cols-2 gap-6 px-4 max-w-6xl mx-auto flex-1"
+                                    variants={{
+                                        hidden: { opacity: 0 },
+                                        visible: {
+                                            opacity: 1,
+                                            transition: { staggerChildren: 0.2 }
+                                        }
+                                    }}
+                                    initial="hidden"
+                                    animate="visible"
+                                >
+                                    {slide.items.map((therapy, index) => (
+                                        <motion.div
+                                            key={therapy.name}
+                                            className="therapy-card group relative overflow-hidden h-[200px]"
+                                        >
+                                            {/* Card Background Image */}
+                                            <div className="absolute inset-0">
+                                                <div className="absolute inset-0 bg-gradient-to-b from-transparent via-[#1a1a2e]/50 to-[#1a1a2e] z-10"></div>
+                                                <motion.img
+                                                    src={therapy.image}
+                                                    alt={therapy.name}
+                                                    className="w-full h-full object-cover opacity-30"
+                                                    initial={{ scale: 1 }}
+                                                    whileHover={{ scale: 1.1 }}
+                                                    transition={{ duration: 0.5 }}
+                                                />
+                                            </div>
+
+                                            {/* Card Content */}
+                                            <div className="relative z-20 p-6 h-full flex flex-col">
+                                                <div className="flex items-center gap-3 mb-3">
+                                                    <motion.div
+                                                        className="w-10 h-10 rounded-full bg-blue-500/10 flex items-center justify-center"
+                                                        whileHover={{ rotate: 360 }}
+                                                        transition={{ duration: 0.5 }}
+                                                    >
+                                                        <i className={`${therapy.icon} text-xl text-blue-400`}></i>
+                                                    </motion.div>
+                                                    <h3 className="text-xl font-semibold text-white">{therapy.name}</h3>
+                                                </div>
+                                                <p className="text-gray-300 text-sm">{therapy.description}</p>
+
+                                                {/* Hover Effect */}
+                                                <motion.div
+                                                    className="absolute bottom-0 left-0 right-0 h-1 bg-gradient-to-r from-blue-400 to-blue-600"
+                                                    initial={{ scaleX: 0 }}
+                                                    whileHover={{ scaleX: 1 }}
+                                                    transition={{ duration: 0.3 }}
+                                                />
+                                            </div>
+                                        </motion.div>
+                                    ))}
+                                </motion.div>
+
+                                {/* Progress Dots */}
+                                <div className="flex justify-center gap-2 mt-6">
+                                    <motion.div className="w-2 h-2 rounded-full bg-blue-500/30"></motion.div>
+                                    <motion.div className="w-2 h-2 rounded-full bg-blue-500"></motion.div>
+                                    <motion.div className="w-2 h-2 rounded-full bg-blue-500/30"></motion.div>
+                                </div>
+                            </motion.div>
+                        );
+                    case 'energy':
+                        return (
+                            <motion.div 
+                                className="h-screen w-screen flex flex-col justify-center p-6 relative overflow-hidden"
+                                initial={{ opacity: 0 }}
+                                animate={{ opacity: 1 }}
+                            >
+                                {/* Background Image with Overlay */}
+                                <div className="absolute inset-0 -z-20">
+                                    <img 
+                                        src={slide.background}
+                                        className="w-full h-full object-cover opacity-10"
+                                        alt="Background"
+                                    />
+                                    <div className="absolute inset-0 bg-gradient-to-b from-[#1a1a2e]/80 via-[#1a1a2e] to-[#1a1a2e]/80" />
+                                </div>
+
+                                <div className="max-w-7xl mx-auto w-full">
+                                    {/* Header */}
+                                    <motion.div 
+                                        className="text-center mb-8"
+                                        initial={{ y: 20, opacity: 0 }}
+                                        animate={{ y: 0, opacity: 1 }}
+                                    >
+                                        <motion.div
+                                            className="w-20 h-20 mx-auto mb-4 relative"
+                                            initial={{ scale: 0 }}
+                                            animate={{ scale: 1 }}
+                                            transition={{ type: "spring", stiffness: 100 }}
+                                        >
+                                            <div className="absolute inset-0 rounded-full bg-gradient-to-br from-violet-400/20 to-fuchsia-400/20 blur-xl" />
+                                            <motion.div
+                                                className="absolute inset-0 rounded-full border border-violet-500/30"
+                                                animate={{
+                                                    scale: [1, 1.2, 1],
+                                                    opacity: [0.3, 0.5, 0.3]
+                                                }}
+                                                transition={{
+                                                    duration: 3,
+                                                    repeat: Infinity,
+                                                    ease: "easeInOut"
+                                                }}
+                                            />
+                                            <div className="absolute inset-2 rounded-full bg-[#1a1a2e] flex items-center justify-center">
+                                                <motion.i 
+                                                    className="ph ph-sparkle text-3xl text-violet-400"
+                                                    animate={{
+                                                        scale: [1, 1.2, 1],
+                                                        rotate: [0, 180, 0],
+                                                        opacity: [0.5, 1, 0.5]
+                                                    }}
+                                                    transition={{
+                                                        duration: 4,
+                                                        repeat: Infinity,
+                                                        ease: "easeInOut"
+                                                    }}
+                                                />
+                                            </div>
+                                        </motion.div>
+                                        
+                                        <motion.h2 
+                                            className="text-5xl font-playfair mb-3 bg-gradient-to-r from-violet-400 to-fuchsia-400 bg-clip-text text-transparent"
+                                            initial={{ y: 20, opacity: 0 }}
+                                            animate={{ y: 0, opacity: 1 }}
+                                            transition={{ delay: 0.2 }}
+                                        >
+                                            Energy Healing
+                                        </motion.h2>
+                                        
+                                        <motion.p 
+                                            className="text-lg text-gray-400 max-w-2xl mx-auto"
+                                            initial={{ y: 20, opacity: 0 }}
+                                            animate={{ y: 0, opacity: 1 }}
+                                            transition={{ delay: 0.3 }}
+                                        >
+                                            Therapies that work with the body's energy fields to promote healing and wellness
+                                        </motion.p>
+                                    </motion.div>
+
+                                    {/* Content Grid */}
+                                    <motion.div 
+                                        className="grid grid-cols-2 gap-6 mt-6"
+                                        variants={{
+                                            hidden: { opacity: 0 },
+                                            visible: { opacity: 1 }
+                                        }}
+                                        initial="hidden"
+                                        animate="visible"
+                                    >
+                                        {[
+                                            {
+                                                title: "Reiki",
+                                                description: "Japanese technique for stress reduction and relaxation that promotes healing",
+                                                icon: "ph-hands",
+                                                color: "violet",
+                                                image: "https://images.unsplash.com/photo-1591343395902-1adcb454c4e2?auto=format&fit=crop&q=80&w=2670"
+                                            },
+                                            {
+                                                title: "Healing Touch",
+                                                description: "Energy therapy that uses gentle hand techniques to influence the energy system",
+                                                icon: "ph-heart-straight",
+                                                color: "fuchsia",
+                                                image: "https://images.unsplash.com/photo-1544367567-0f2fcb009e0b?auto=format&fit=crop&q=80&w=2694"
+                                            },
+                                            {
+                                                title: "Quantum Touch",
+                                                description: "Method of hands-on healing that focuses on breathing and body awareness",
+                                                icon: "ph-wave-sine",
+                                                color: "purple",
+                                                image: "https://images.unsplash.com/photo-1600880292203-757bb62b4baf?auto=format&fit=crop&q=80&w=2670"
+                                            },
+                                            {
+                                                title: "Crystal Therapy",
+                                                description: "Use of crystals and gemstones to promote energy healing and balance",
+                                                icon: "ph-diamond",
+                                                color: "pink",
+                                                image: "https://www.zentherapytraining.co.uk/wp-content/uploads/bb-plugin/cache/AdobeStock_88105105-1024x683-square.jpeg"
+                                            }
+                                        ].map((item, index) => (
+                                            <motion.div
+                                                key={item.title}
+                                                className="relative group h-[220px]"
+                                                variants={{
+                                                    hidden: { y: 20, opacity: 0 },
+                                                    visible: { 
+                                                        y: 0, 
+                                                        opacity: 1,
+                                                        transition: {
+                                                            delay: 0.2 * index
+                                                        }
+                                                    }
+                                                }}
+                                            >
+                                                <div className="absolute inset-0 rounded-xl overflow-hidden">
+                                                    <div className="absolute inset-0 bg-gradient-to-t from-[#1a1a2e] via-[#1a1a2e]/80 to-transparent z-10" />
+                                                    <motion.img
+                                                        src={item.image}
+                                                        alt={item.title}
+                                                        className="w-full h-full object-cover opacity-60"
+                                                        initial={{ scale: 1 }}
+                                                        whileHover={{ scale: 1.1 }}
+                                                        transition={{ duration: 0.5 }}
+                                                    />
+                                                </div>
+
+                                                <div className="relative z-20 h-full p-4 flex flex-col justify-end">
+                                                    <div className="flex items-center gap-3 mb-2">
+                                                        <div className={`w-10 h-10 rounded-lg bg-${item.color}-500/10 flex items-center justify-center backdrop-blur-sm`}>
+                                                            <motion.i 
+                                                                className={`${item.icon} text-xl text-${item.color}-400`}
+                                                                animate={{
+                                                                    scale: [1, 1.2, 1],
+                                                                    rotate: [0, 10, -10, 0]
+                                                                }}
+                                                                transition={{
+                                                                    duration: 3,
+                                                                    repeat: Infinity,
+                                                                    ease: "easeInOut",
+                                                                    delay: index * 0.2
+                                                                }}
+                                                            />
+                                                        </div>
+                                                        <h3 className="text-xl font-semibold text-white group-hover:text-violet-300 transition-colors duration-300">
+                                                            {item.title}
+                                                        </h3>
+                                                    </div>
+                                                    <p className="text-sm text-gray-300 backdrop-blur-sm bg-black/20 p-3 rounded-lg">
+                                                        {item.description}
+                                                    </p>
+
+                                                    <motion.div
+                                                        className={`absolute bottom-0 left-0 right-0 h-0.5 bg-gradient-to-r from-${item.color}-400 to-${item.color}-600`}
+                                                        initial={{ scaleX: 0 }}
+                                                        whileHover={{ scaleX: 1 }}
+                                                        transition={{ duration: 0.3 }}
+                                                    />
+                                                </div>
+                                            </motion.div>
+                                        ))}
+                                    </motion.div>
+
+                                    {/* Progress Dots */}
+                                    <div className="flex justify-center gap-2 mt-6">
+                                        <motion.div className="w-1.5 h-1.5 rounded-full bg-violet-500/30"></motion.div>
+                                        <motion.div className="w-1.5 h-1.5 rounded-full bg-violet-500/30"></motion.div>
+                                        <motion.div className="w-1.5 h-1.5 rounded-full bg-violet-500"></motion.div>
+                                        <motion.div className="w-1.5 h-1.5 rounded-full bg-violet-500/30"></motion.div>
+                                        <motion.div className="w-1.5 h-1.5 rounded-full bg-violet-500/30"></motion.div>
+                                    </div>
+                                </div>
+                            </motion.div>
+                        );
+                    case 'benefits':
+                        return (
+                            <motion.div 
+                                className="h-screen w-screen flex flex-col justify-center p-6 relative overflow-hidden"
+                                initial={{ opacity: 0 }}
+                                animate={{ opacity: 1 }}
+                            >
+                                {/* Background Image with Overlay */}
+                                <div className="absolute inset-0 -z-20">
+                                    <img 
+                                        src={slide.background}
+                                        className="w-full h-full object-cover opacity-10"
+                                        alt="Background"
+                                    />
+                                    <div className="absolute inset-0 bg-gradient-to-b from-[#1a1a2e]/80 via-[#1a1a2e] to-[#1a1a2e]/80" />
+                                </div>
+
+                                <div className="max-w-7xl mx-auto w-full">
+                                    {/* Header */}
+                                    <motion.div 
+                                        className="text-center mb-16"
+                                        initial={{ y: 20, opacity: 0 }}
+                                        animate={{ y: 0, opacity: 1 }}
+                                    >
+                                        <motion.div
+                                            className="w-32 h-32 mx-auto mb-8 relative"
+                                            initial={{ scale: 0 }}
+                                            animate={{ scale: 1 }}
+                                            transition={{ type: "spring", stiffness: 100 }}
+                                        >
+                                            <div className="absolute inset-0 rounded-full bg-gradient-to-br from-indigo-400/20 to-purple-400/20 blur-xl" />
+                                            <motion.div
+                                                className="absolute inset-4 rounded-full bg-[#1a1a2e] flex items-center justify-center"
+                                                animate={{
+                                                    rotate: [0, 360],
+                                                }}
+                                                transition={{
+                                                    duration: 20,
+                                                    repeat: Infinity,
+                                                    ease: "linear"
+                                                }}
+                                            >
+                                                <i className="ph ph-chart-line-up text-5xl text-indigo-400" />
+                                            </motion.div>
+                                        </motion.div>
+
+                                        <motion.h2 
+                                            className="text-6xl font-playfair mb-6 bg-gradient-to-r from-indigo-400 to-purple-400 bg-clip-text text-transparent"
+                                            initial={{ y: 20, opacity: 0 }}
+                                            animate={{ y: 0, opacity: 1 }}
+                                            transition={{ delay: 0.2 }}
+                                        >
+                                            Benefits & Research
+                                        </motion.h2>
+
+                                        <motion.p 
+                                            className="text-xl text-gray-400 max-w-3xl mx-auto"
+                                            initial={{ y: 20, opacity: 0 }}
+                                            animate={{ y: 0, opacity: 1 }}
+                                            transition={{ delay: 0.3 }}
+                                        >
+                                            Evidence-based outcomes and research findings supporting complementary therapies in nursing practice
+                                        </motion.p>
+                                    </motion.div>
+
+                                    {/* Content Grid */}
+                                    <motion.div 
+                                        className="grid grid-cols-2 gap-8 mt-12"
+                                        variants={{
+                                            hidden: { opacity: 0 },
+                                            visible: { opacity: 1 }
+                                        }}
+                                        initial="hidden"
+                                        animate="visible"
+                                    >
+                                        {[
+                                            {
+                                                title: "Clinical Outcomes",
+                                                description: "Significant reduction in pain levels, anxiety, and stress in patients receiving complementary therapies",
+                                                icon: "ph-heartbeat",
+                                                stats: "70% improvement",
+                                                image: "https://images.squarespace-cdn.com/content/v1/54f49197e4b0d73e9daa9ef9/1498057478717-O9Q7ATLUXP122ZTFSKKO/Management+Meeting+Funnel.png",
+                                                color: "indigo"
+                                            },
+                                            {
+                                                title: "Patient Satisfaction",
+                                                description: "Higher patient satisfaction scores and improved overall healthcare experience",
+                                                icon: "ph-smiley",
+                                                stats: "85% satisfaction",
+                                                image: "https://images.unsplash.com/photo-1666214280557-f1b5022eb634?auto=format&fit=crop&q=80&w=2670",
+                                                color: "purple"
+                                            },
+                                            {
+                                                title: "Cost Effectiveness",
+                                                description: "Reduced medication usage and shorter hospital stays when combined with standard care",
+                                                icon: "ph-chart-bar",
+                                                stats: "30% reduction",
+                                                image: "https://images.unsplash.com/photo-1563986768494-4dee2763ff3f?auto=format&fit=crop&q=80&w=2670",
+                                                color: "violet"
+                                            },
+                                            {
+                                                title: "Evidence Base",
+                                                description: "Growing body of research supporting the efficacy of complementary therapies in healthcare",
+                                                icon: "ph-books",
+                                                stats: "1000+ studies",
+                                                image: "https://images.unsplash.com/photo-1532938911079-1b06ac7ceec7?auto=format&fit=crop&q=80&w=2670",
+                                                color: "fuchsia"
+                                            }
+                                        ].map((item, index) => (
+                                            <motion.div
+                                                key={item.title}
+                                                className="relative group h-[220px]"
+                                                variants={{
+                                                    hidden: { y: 20, opacity: 0 },
+                                                    visible: { 
+                                                        y: 0, 
+                                                        opacity: 1,
+                                                        transition: {
+                                                            delay: 0.2 * index
+                                                        }
+                                                    }
+                                                }}
+                                            >
+                                                <div className="absolute inset-0 rounded-xl overflow-hidden">
+                                                    <div className="absolute inset-0 bg-gradient-to-t from-[#1a1a2e] via-[#1a1a2e]/80 to-transparent z-10" />
+                                                    <motion.img
+                                                        src={item.image}
+                                                        alt={item.title}
+                                                        className="w-full h-full object-cover opacity-50"
+                                                        initial={{ scale: 1 }}
+                                                        whileHover={{ scale: 1.1 }}
+                                                        transition={{ duration: 0.5 }}
+                                                    />
+                                                </div>
+
+                                                <div className="relative z-20 h-full p-4 flex flex-col justify-between">
+                                                    <div className="flex items-center justify-between">
+                                                        <div className="flex items-center gap-3">
+                                                            <div className={`w-10 h-10 rounded-lg bg-${item.color}-500/10 flex items-center justify-center backdrop-blur-sm`}>
+                                                                <motion.i 
+                                                                    className={`${item.icon} text-xl text-${item.color}-400`}
+                                                                    animate={{
+                                                                        scale: [1, 1.2, 1],
+                                                                    }}
+                                                                    transition={{
+                                                                        duration: 2,
+                                                                        repeat: Infinity,
+                                                                        ease: "easeInOut",
+                                                                        delay: index * 0.2
+                                                                    }}
+                                                                />
+                                                            </div>
+                                                            <h3 className="text-xl font-semibold text-white group-hover:text-indigo-300 transition-colors duration-300">
+                                                                {item.title}
+                                                            </h3>
+                                                        </div>
+                                                        <div className={`text-lg font-bold text-${item.color}-400 backdrop-blur-sm bg-${item.color}-500/5 px-3 py-1 rounded-full`}>
+                                                            {item.stats}
+                                                        </div>
+                                                    </div>
+                                                    
+                                                    <p className="text-sm text-gray-300 backdrop-blur-sm bg-black/20 p-3 rounded-lg mt-3">
+                                                        {item.description}
+                                                    </p>
+
+                                                    <motion.div
+                                                        className={`absolute bottom-0 left-0 right-0 h-0.5 bg-gradient-to-r from-${item.color}-400 to-${item.color}-600`}
+                                                        initial={{ scaleX: 0 }}
+                                                        whileHover={{ scaleX: 1 }}
+                                                        transition={{ duration: 0.3 }}
+                                                    />
+                                                </div>
+                                            </motion.div>
+                                        ))}
+                                    </motion.div>
+                                </div>
+
+                                {/* Progress Dots */}
+                                <div className="flex justify-center gap-2 mt-12">
+                                    <motion.div className="w-2 h-2 rounded-full bg-indigo-500/30"></motion.div>
+                                    <motion.div className="w-2 h-2 rounded-full bg-indigo-500/30"></motion.div>
+                                    <motion.div className="w-2 h-2 rounded-full bg-indigo-500/30"></motion.div>
+                                    <motion.div className="w-2 h-2 rounded-full bg-indigo-500"></motion.div>
+                                </div>
+                            </motion.div>
+                        );
+                    case 'success':
+                        return (
+                            <motion.div 
+                                className="h-screen w-screen flex flex-col justify-center p-6 relative overflow-hidden"
+                                initial={{ opacity: 0 }}
+                                animate={{ opacity: 1 }}
+                            >
+                                {/* Background Image with Overlay */}
+                                <div className="absolute inset-0 -z-20">
+                                    <img 
+                                        src={slide.background}
+                                        className="w-full h-full object-cover opacity-10"
+                                        alt="Background"
+                                    />
+                                    <div className="absolute inset-0 bg-gradient-to-b from-[#1a1a2e]/80 via-[#1a1a2e] to-[#1a1a2e]/80" />
+                                </div>
+
+                                {/* Header */}
+                                <motion.div 
+                                    className="text-center mb-6"
+                                    initial={{ y: 20, opacity: 0 }}
+                                    animate={{ y: 0, opacity: 1 }}
+                                >
+                                    <motion.h2 
+                                        className="text-5xl font-playfair mb-3 bg-gradient-to-r from-emerald-400 to-teal-400 bg-clip-text text-transparent"
+                                        initial={{ y: 20, opacity: 0 }}
+                                        animate={{ y: 0, opacity: 1 }}
+                                        transition={{ delay: 0.2 }}
+                                    >
+                                        Patient Success Stories
+                                    </motion.h2>
+                                    
+                                    <motion.p 
+                                        className="text-lg text-gray-400 max-w-2xl mx-auto"
+                                        initial={{ y: 20, opacity: 0 }}
+                                        animate={{ y: 0, opacity: 1 }}
+                                        transition={{ delay: 0.3 }}
+                                    >
+                                        Real-world examples of how complementary therapies transform patient care and recovery
+                                    </motion.p>
+                                </motion.div>
+
+                                {/* Success Story Cards */}
+                                <motion.div 
+                                    className="grid grid-cols-2 gap-5 mt-4"
+                                    variants={{
+                                        hidden: { opacity: 0 },
+                                        visible: { opacity: 1 }
+                                    }}
+                                    initial="hidden"
+                                    animate="visible"
+                                >
+                                    {[
+                                        {
+                                            title: "Pain Management Success",
+                                            description: "Chronic pain patients reported 65% reduction in pain levels through integrated therapy approach",
+                                            image: "https://images.unsplash.com/photo-1576091160399-112ba8d25d1d?auto=format&fit=crop&q=80&w=2670",
+                                            icon: "ph-bandaids",
+                                            testimonial: "After years of chronic pain, I finally found relief through these therapies"
+                                        },
+                                        {
+                                            title: "Stress & Anxiety Relief",
+                                            description: "90% of patients showed significant reduction in anxiety symptoms within 8 weeks",
+                                            image: "https://images.unsplash.com/photo-1545205597-3d9d02c29597?auto=format&fit=crop&q=80&w=2670",
+                                            icon: "ph-peace",
+                                            testimonial: "The meditation sessions transformed my anxiety into calm"
+                                        },
+                                        {
+                                            title: "Recovery Enhancement",
+                                            description: "Post-surgery recovery time reduced by 40% with complementary therapy integration",
+                                            image: "https://images.unsplash.com/photo-1579684385127-1ef15d508118?auto=format&fit=crop&q=80&w=2680",
+                                            icon: "ph-activity",
+                                            testimonial: "My recovery exceeded all expectations thanks to these treatments"
+                                        },
+                                        {
+                                            title: "Quality of Life",
+                                            description: "Significant improvement in sleep quality and daily functioning reported by 80% of patients",
+                                            image: "https://images.unsplash.com/photo-1513159446162-54eb8bdaa79b?auto=format&fit=crop&q=80&w=2670",
+                                            icon: "ph-sun",
+                                            testimonial: "I've regained my energy and joy for life"
+                                        }
+                                    ].map((item, index) => (
+                                        <motion.div
+                                            key={item.title}
+                                            className="relative group h-[200px]"
+                                            variants={{
+                                                hidden: { y: 20, opacity: 0 },
+                                                visible: { 
+                                                    y: 0, 
+                                                    opacity: 1,
+                                                    transition: {
+                                                        delay: 0.2 * index
+                                                    }
+                                                }
+                                            }}
+                                        >
+                                            <div className="absolute inset-0 rounded-xl overflow-hidden">
+                                                <div className="absolute inset-0 bg-gradient-to-t from-[#1a1a2e] via-[#1a1a2e]/80 to-transparent z-10" />
+                                                <motion.img
+                                                    src={item.image}
+                                                    alt={item.title}
+                                                    className="w-full h-full object-cover opacity-60"
+                                                    initial={{ scale: 1 }}
+                                                    whileHover={{ scale: 1.1 }}
+                                                    transition={{ duration: 0.5 }}
+                                                />
+                                            </div>
+
+                                            <div className="relative z-20 h-full p-4 flex flex-col">
+                                                <div className="flex items-center gap-3 mb-1">
+                                                    <div className="w-8 h-8 rounded-lg bg-emerald-500/10 flex items-center justify-center backdrop-blur-sm">
+                                                        <motion.i 
+                                                            className={`${item.icon} text-lg text-emerald-400`}
+                                                            animate={{
+                                                                scale: [1, 1.2, 1],
+                                                            }}
+                                                            transition={{
+                                                                duration: 2,
+                                                                repeat: Infinity,
+                                                                ease: "easeInOut",
+                                                                delay: index * 0.2
+                                                            }}
+                                                        />
+                                                    </div>
+                                                    <h3 className="text-lg font-semibold text-white group-hover:text-emerald-300 transition-colors duration-300">
+                                                        {item.title}
+                                                    </h3>
+                                                </div>
+
+                                                <p className="text-sm text-gray-300 mb-2">
+                                                    {item.description}
+                                                </p>
+
+                                                <div className="mt-auto">
+                                                    <p className="text-sm text-emerald-300 italic backdrop-blur-sm bg-emerald-900/10 p-2 rounded-lg">
+                                                        "{item.testimonial}"
+                                                    </p>
+                                                </div>
+
+                                                <motion.div
+                                                    className="absolute bottom-0 left-0 right-0 h-0.5 bg-gradient-to-r from-emerald-400 to-teal-400"
+                                                    initial={{ scaleX: 0 }}
+                                                    whileHover={{ scaleX: 1 }}
+                                                    transition={{ duration: 0.3 }}
+                                                />
+                                            </div>
+                                        </motion.div>
+                                    ))}
+                                </motion.div>
+
+                                {/* Progress Dots */}
+                                <div className="flex justify-center gap-2 mt-4">
+                                    <motion.div className="w-1.5 h-1.5 rounded-full bg-emerald-500/30"></motion.div>
+                                    <motion.div className="w-1.5 h-1.5 rounded-full bg-emerald-500/30"></motion.div>
+                                    <motion.div className="w-1.5 h-1.5 rounded-full bg-emerald-500/30"></motion.div>
+                                    <motion.div className="w-1.5 h-1.5 rounded-full bg-emerald-500"></motion.div>
+                                    <motion.div className="w-1.5 h-1.5 rounded-full bg-emerald-500/30"></motion.div>
+                                </div>
+                            </motion.div>
+                        );
+                    default:
+                        return null;
+                }
+            };
+
+            // Add shared button styles
+            const buttonStyles = {
+                position: 'fixed',
+                bottom: '2rem',
+                right: '2rem',
+                background: currentSlide === slides.length - 1 
+                    ? 'linear-gradient(135deg, #10b981, #059669)' 
+                    : 'linear-gradient(135deg, #e879f9, #818cf8)',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '0.5rem',
+                padding: '0.75rem 1.5rem',
+                fontSize: '1rem',
+                fontWeight: '500',
+                borderRadius: '9999px',
+                border: 'none',
+                outline: 'none',
+                color: 'white',
+                cursor: 'pointer',
+                zIndex: 50,
+                boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)',
+                transition: 'all 0.3s ease'
+            };
+
+            return (
+                <div className="min-h-screen p-8 relative overflow-hidden bg-gradient-to-b from-[#1a1a2e] to-[#15162c]">
+                    <AnimatePresence mode="wait">
+                        <motion.div
+                            key={currentSlide}
+                            initial={{ opacity: 0, x: 20 }}
+                            animate={{ opacity: 1, x: 0 }}
+                            exit={{ opacity: 0, x: -20 }}
+                            className="w-full"
+                        >
+                            {renderSlide(slides[currentSlide])}
+                        </motion.div>
+                    </AnimatePresence>
+
+                    {/* Next/Finish Button */}
+                    <motion.button
+                        className="next-button"
+                        onClick={handleNext}
+                        initial={{ opacity: 0 }}
+                        animate={{ 
+                            opacity: 1,
+                            scale: 1,
+                            background: currentSlide === slides.length - 1 
+                                ? 'linear-gradient(135deg, #10b981, #059669)'
+                                : 'linear-gradient(135deg, #e879f9, #818cf8)'
+                        }}
+                        whileHover={{ scale: 1.05 }}
+                        whileTap={{ scale: 0.95 }}
+                        style={buttonStyles}
+                    >
+                        {currentSlide === slides.length - 1 ? (
+                            <>
+                                Finish <i className="ph ph-check-circle"></i>
+                            </>
+                        ) : (
+                            <>
+                                Next <i className="ph ph-arrow-right"></i>
+                            </>
+                        )}
+                    </motion.button>
+
+                    {/* Progress Dots */}
+                    <div className="fixed bottom-8 left-1/2 transform -translate-x-1/2 flex gap-2">
+                        {slides.map((_, index) => (
+                            <motion.div
+                                key={index}
+                                className="w-1.5 h-1.5 rounded-full cursor-pointer"
+                                style={{
+                                    background: index === currentSlide 
+                                        ? currentSlide === slides.length - 1 
+                                            ? '#10b981' // Emerald color for last slide
+                                            : 'var(--highlight-color, #e879f9)' 
+                                        : 'rgba(255,255,255,0.2)',
+                                    transition: 'background 0.3s ease'
+                                }}
+                                initial={{ scale: 0 }}
+                                animate={{ scale: 1 }}
+                                transition={{ delay: index * 0.1 }}
+                                onClick={() => setCurrentSlide(index)}
+                                whileHover={{ scale: 1.5 }}
+                            />
+                        ))}
+                    </div>
+
+                    {/* Completion Animation */}
+                    <motion.div
+                        className="fixed inset-0 pointer-events-none"
+                        initial={{ opacity: 0 }}
+                        animate={{ 
+                            opacity: currentSlide === slides.length - 1 ? 1 : 0 
+                        }}
+                    >
+                        <div className="absolute inset-0 bg-gradient-to-br from-emerald-500/10 to-transparent" />
+                        {[...Array(20)].map((_, i) => (
+                            <motion.div
+                                key={i}
+                                className="absolute w-1 h-1 rounded-full bg-emerald-400"
+                                style={{
+                                    left: `${Math.random() * 100}%`,
+                                    top: `${Math.random() * 100}%`,
+                                }}
+                                animate={{
+                                    scale: [0, 1, 0],
+                                    opacity: [0, 1, 0],
+                                    y: [0, -30, 0],
+                                }}
+                                transition={{
+                                    duration: 2,
+                                    repeat: Infinity,
+                                    delay: i * 0.1,
+                                    ease: "easeInOut"
+                                }}
+                            />
+                        ))}
+                    </motion.div>
+                </div>
+            );
+        }
+
+        const root = ReactDOM.createRoot(document.getElementById('root'));
+        root.render(<ComplementaryTherapies />);
+    </script>
+</body>
+</html>

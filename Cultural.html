@@ -1,0 +1,1244 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cultural Diversity & Mental Health</title>
+    <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <script src="https://unpkg.com/framer-motion@10.16.4/dist/framer-motion.js"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=Poppins:wght@300;400;500;600;700&display=swap');
+        
+        :root {
+            --primary-gradient: linear-gradient(135deg, #6366f1, #a855f7);
+            --card-gradient: linear-gradient(to right bottom, rgba(255, 255, 255, 0.05), rgba(255, 255, 255, 0.02));
+            --glass-effect: rgba(255, 255, 255, 0.05);
+            --border-color: rgba(255, 255, 255, 0.1);
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: #0f172a;
+            color: white;
+            overflow: hidden;
+            margin: 0;
+            padding: 0;
+            height: 100vh;
+            width: 100vw;
+        }
+
+        .culture-card {
+            background: var(--card-gradient);
+            backdrop-filter: blur(10px);
+            border: 1px solid var(--border-color);
+            border-radius: 24px;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            overflow: hidden;
+            transform-style: preserve-3d;
+            perspective: 1000px;
+        }
+
+        .culture-card:hover {
+            transform: translateY(-5px) rotateX(5deg);
+            border-color: rgba(255, 255, 255, 0.2);
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.3);
+        }
+
+        .culture-card::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: var(--primary-gradient);
+            opacity: 0;
+            transition: opacity 0.4s ease;
+            z-index: -1;
+            border-radius: inherit;
+        }
+
+        .culture-card:hover::before {
+            opacity: 0.1;
+        }
+
+        .gradient-text {
+            background: var(--primary-gradient);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+
+        .glass-effect {
+            background: var(--glass-effect);
+            backdrop-filter: blur(10px);
+            border: 1px solid var(--border-color);
+            transition: all 0.3s ease;
+        }
+
+        .glass-effect:hover {
+            background: rgba(255, 255, 255, 0.08);
+            border-color: rgba(255, 255, 255, 0.2);
+        }
+
+        .modern-shadow {
+            box-shadow: 0 10px 30px -5px rgba(0, 0, 0, 0.3);
+        }
+
+        .hover-lift {
+            transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .hover-lift:hover {
+            transform: translateY(-2px);
+        }
+
+        .glow {
+            position: relative;
+        }
+
+        .glow::after {
+            content: '';
+            position: absolute;
+            inset: -1px;
+            background: var(--primary-gradient);
+            filter: blur(15px);
+            opacity: 0;
+            transition: opacity 0.3s ease;
+            z-index: -1;
+            border-radius: inherit;
+        }
+
+        .glow:hover::after {
+            opacity: 0.5;
+        }
+
+        .nav-dots {
+            display: flex;
+            gap: 8px;
+            padding: 8px;
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: 20px;
+            backdrop-filter: blur(5px);
+        }
+
+        .nav-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.2);
+            transition: all 0.3s ease;
+        }
+
+        .nav-dot.active {
+            background: var(--primary-gradient);
+            transform: scale(1.2);
+        }
+
+        @keyframes float {
+            0% { transform: translateY(0px); }
+            50% { transform: translateY(-10px); }
+            100% { transform: translateY(0px); }
+        }
+
+        .float {
+            animation: float 3s ease-in-out infinite;
+        }
+
+        .icon-box {
+            width: 48px;
+            height: 48px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 12px;
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            transition: all 0.3s ease;
+        }
+
+        .icon-box:hover {
+            transform: scale(1.1);
+            background: rgba(255, 255, 255, 0.15);
+        }
+
+        .icon-square {
+            padding: 12px;
+            border-radius: 16px;
+            background: linear-gradient(135deg, rgba(99, 102, 241, 0.1), rgba(168, 85, 247, 0.1));
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+    </style>
+</head>
+<body>
+    <div id="root"></div>
+    <script type="text/babel">
+        const { motion, AnimatePresence } = Motion;
+
+        // Icon Component
+        const Icon = ({ name, size = 24, color = "currentColor", weight = "fill" }) => {
+            return (
+                <i className={`ph-${name} ph-${weight}`} style={{ fontSize: size, color }}></i>
+            );
+        };
+
+        function CulturalDiversityPresentation() {
+            const [currentSlide, setCurrentSlide] = React.useState(0);
+
+            const slides = [
+                {
+                    type: 'intro',
+                    title: 'Cultural Diversity',
+                    subtitle: '& Mental Health',
+                    description: 'Understanding the profound influence of cultural diversity on mental health experiences, expressions, and interventions.',
+                    icons: [
+                        { name: 'heart', color: 'text-pink-400' },
+                        { name: 'brain', color: 'text-indigo-400' },
+                        { name: 'hands-clapping', color: 'text-purple-400' },
+                        { name: 'users-three', color: 'text-blue-400' },
+                        { name: 'sparkle', color: 'text-fuchsia-400' }
+                    ]
+                },
+                {
+                    type: 'understanding',
+                    title: 'Cultural Influences',
+                    subtitle: 'Understanding & Experience',
+                    items: [
+                        {
+                            title: 'Worldview & Beliefs',
+                            description: 'How different cultures interpret causes of illness and nature of suffering',
+                            icon: 'globe',
+                            image: 'https://images.unsplash.com/photo-1531206715517-5c0ba140b2b8?auto=format&fit=crop&q=80&w=2670'
+                        },
+                        {
+                            title: 'Symptom Expression',
+                            description: 'Variations in how mental health symptoms manifest across cultures',
+                            icon: 'brain',
+                            image: 'https://images.unsplash.com/photo-1559757175-0eb30cd8c063?auto=format&fit=crop&q=80&w=2670'
+                        },
+                        {
+                            title: 'Coping Mechanisms',
+                            description: 'Cultural norms influencing stress management and emotional expression',
+                            icon: 'heart-half',
+                            image: 'https://images.unsplash.com/photo-1506126613408-eca07ce68773?auto=format&fit=crop&q=80&w=2670'
+                        }
+                    ]
+                },
+                {
+                    type: 'barriers',
+                    title: 'Stigma & Barriers',
+                    subtitle: 'Help-Seeking Behaviors',
+                    items: [
+                        {
+                            title: 'Cultural Stigma',
+                            description: 'Varying intensities and manifestations of mental health stigma',
+                            icon: 'prohibit',
+                            image: 'https://images.unsplash.com/photo-1494774157365-9e04c6720e47?auto=format&fit=crop&q=80&w=2670'
+                        },
+                        {
+                            title: 'Communication',
+                            description: 'Language barriers and cultural communication differences',
+                            icon: 'chats',
+                            image: 'https://images.unsplash.com/photo-1521791136064-7986c2920216?auto=format&fit=crop&q=80&w=2669'
+                        },
+                        {
+                            title: 'Traditional Healing',
+                            description: 'Preference for cultural healing practices over Western approaches',
+                            icon: 'hands-praying',
+                            image: 'https://images.unsplash.com/photo-1544367567-0f2fcb009e0b?auto=format&fit=crop&q=80&w=2694'
+                        },
+                        {
+                            title: 'Family Impact',
+                            description: 'Family honor and collective identity influences',
+                            icon: 'users-three',
+                            image: 'https://images.unsplash.com/photo-1511895426328-dc8714191300?auto=format&fit=crop&q=80&w=2670'
+                        }
+                    ]
+                },
+                {
+                    type: 'competence',
+                    title: 'Lack of Cultural Competence',
+                    subtitle: 'in Mental Healthcare',
+                    items: [
+                       
+                        {
+                            title: 'Communication Barriers',
+                            description: 'Insufficient language services and cultural communication skills',
+                            icon: 'translate',
+                            image: 'https://images.unsplash.com/photo-1573497620053-ea5300f94f21?auto=format&fit=crop&q=80&w=2670'
+                        },
+                        {
+                            title: 'Biased Assessment',
+                            description: 'Using culturally inappropriate diagnostic tools and methods',
+                            icon: 'clipboard',
+                            image: 'https://images.unsplash.com/photo-1582213782179-e0d53f98f2ca?auto=format&fit=crop&q=80&w=2670'
+                        },
+                        {
+                            title: 'Treatment Mismatch',
+                            description: 'Failure to incorporate cultural healing practices and beliefs',
+                            icon: 'bandaids',
+                            image: 'https://images.unsplash.com/photo-1584515933487-779824d29309?auto=format&fit=crop&q=80&w=2670'
+                        }
+                    ]
+                },
+                {
+                    type: 'interventions',
+                    title: 'Culturally Sensitive',
+                    subtitle: 'Interventions',
+                    items: [
+                        {
+                            title: 'Tailored Approaches',
+                            description: 'Culturally adapted psychotherapies and treatment methods',
+                            icon: 'target',
+                            image: 'https://media.istockphoto.com/id/1426453168/photo/three-puzzle-pieces-connected-by-a-red-thread-concept-photography.jpg?s=612x612&w=0&k=20&c=72A68DaYJhrTacHy5y08s5bcDU3Nu9n2WtqLKVzWnzk='
+                        },
+                        {
+                            title: 'Community Engagement',
+                            description: 'Involving local leaders and community resources',
+                            icon: 'users-four',
+                            image: 'https://images.unsplash.com/photo-1582213782179-e0d53f98f2ca?auto=format&fit=crop&q=80&w=2670'
+                        },
+                        {
+                            title: 'Digital Solutions',
+                            description: 'Culturally tailored digital mental health platforms',
+                            icon: 'device-mobile',
+                            image: 'https://mrccdigital.com/wp-content/uploads/2021/02/digital_Solutions_s.png'
+                        }
+                    ]
+                },
+                {
+                    type: 'outro',
+                    title: 'Any Question'
+                },
+                {
+                    type: 'thankyou',
+                    title: 'Thank You'
+                }
+            ];
+
+            const handleNext = () => {
+                if (currentSlide < slides.length - 1) {
+                    setCurrentSlide(prev => prev + 1);
+                }
+            };
+
+            const handlePrevious = () => {
+                if (currentSlide > 0) {
+                    setCurrentSlide(prev => prev - 1);
+                }
+            };
+
+            const renderSlide = (slide) => {
+                switch (slide.type) {
+                    case 'intro':
+                        return (
+                            <motion.div 
+                                className="h-screen w-screen flex items-center justify-center relative overflow-hidden"
+                                initial={{ opacity: 0 }}
+                                animate={{ opacity: 1 }}
+                            >
+                                {/* Background Image with Overlay */}
+                                <div className="absolute inset-0 -z-10">
+                                    <img 
+                                        src="https://images.unsplash.com/photo-1526662092594-e98c1e356d6a?auto=format&fit=crop&q=80&w=2971"
+                                        alt="Diverse group of people"
+                                        className="w-full h-full object-cover opacity-20"
+                                    />
+                                    <div className="absolute inset-0 bg-gradient-to-br from-indigo-900/80 via-purple-900/80 to-fuchsia-900/80" />
+                                </div>
+
+                                {/* Floating Icons */}
+                                <motion.div className="absolute inset-0">
+                                    {slide.icons.map((item, i) => (
+                                        <motion.div
+                                            key={i}
+                                            className={`absolute ${item.color} opacity-30`}
+                                            style={{
+                                                left: `${Math.random() * 100}%`,
+                                                top: `${Math.random() * 100}%`,
+                                            }}
+                                            animate={{
+                                                y: [0, -30, 0],
+                                                rotate: [0, 360],
+                                                scale: [1, 1.2, 1],
+                                                opacity: [0.3, 0.6, 0.3],
+                                            }}
+                                            transition={{
+                                                duration: 10 + Math.random() * 5,
+                                                repeat: Infinity,
+                                                ease: "easeInOut"
+                                            }}
+                                        >
+                                            <Icon name={item.name} size={32} />
+                                        </motion.div>
+                                    ))}
+                                </motion.div>
+
+                                {/* Content */}
+                                <div className="relative z-10 text-center px-4">
+                                    <motion.div
+                                        initial={{ y: 50, opacity: 0 }}
+                                        animate={{ y: 0, opacity: 1 }}
+                                        transition={{ duration: 1 }}
+                                        className="space-y-8"
+                                    >
+                                        <motion.h1 
+                                            className="text-8xl md:text-9xl font-playfair font-bold mb-4 relative"
+                                            style={{
+                                                background: 'linear-gradient(135deg, #6366f1 0%, #a855f7 100%)',
+                                                WebkitBackgroundClip: 'text',
+                                                WebkitTextFillColor: 'transparent',
+                                                backgroundClip: 'text'
+                                            }}
+                                        >
+                                            {slide.title}
+                                            <motion.div
+                                                className="absolute -inset-4 bg-gradient-to-r from-indigo-500 to-purple-500 opacity-20 blur-3xl -z-10"
+                                                animate={{
+                                                    scale: [1, 1.1, 1],
+                                                    opacity: [0.2, 0.3, 0.2],
+                                                }}
+                                                transition={{
+                                                    duration: 4,
+                                                    repeat: Infinity,
+                                                    ease: "easeInOut"
+                                                }}
+                                            />
+                                        </motion.h1>
+                                        
+                                        <motion.span 
+                                            className="text-6xl md:text-7xl block mb-8 relative"
+                                            style={{
+                                                background: 'linear-gradient(135deg, #818cf8 0%, #c084fc 100%)',
+                                                WebkitBackgroundClip: 'text',
+                                                WebkitTextFillColor: 'transparent',
+                                                backgroundClip: 'text'
+                                            }}
+                                        >
+                                            {slide.subtitle}
+                                        </motion.span>
+
+                                        <motion.p 
+                                            className="text-2xl text-gray-300 max-w-3xl mx-auto leading-relaxed glass-effect p-6 rounded-2xl modern-shadow"
+                                            initial={{ y: 20, opacity: 0 }}
+                                            animate={{ y: 0, opacity: 1 }}
+                                            transition={{ delay: 0.5 }}
+                                        >
+                                            {slide.description}
+                                        </motion.p>
+
+                                        {/* Modern Scroll Indicator */}
+                                        <motion.div
+                                            className="absolute bottom-12 left-1/2 transform -translate-x-1/2"
+                                            animate={{
+                                                y: [0, 10, 0],
+                                            }}
+                                            transition={{
+                                                duration: 2,
+                                                repeat: Infinity,
+                                                ease: "easeInOut"
+                                            }}
+                                        >
+                                            <div className="w-6 h-10 rounded-full border-2 border-white/30 flex items-start justify-center p-2">
+                                                <motion.div
+                                                    className="w-1 h-1 bg-white rounded-full"
+                                                    animate={{
+                                                        y: [0, 12, 0],
+                                                    }}
+                                                    transition={{
+                                                        duration: 2,
+                                                        repeat: Infinity,
+                                                        ease: "easeInOut"
+                                                    }}
+                                                />
+                                            </div>
+                                        </motion.div>
+                                    </motion.div>
+                                </div>
+                            </motion.div>
+                        );
+                    
+                    case 'understanding':
+                        return (
+                            <motion.div 
+                                className="h-screen w-screen flex flex-col justify-center p-8 relative overflow-hidden"
+                                initial={{ opacity: 0 }}
+                                animate={{ opacity: 1 }}
+                            >
+                                {/* Background Image with Overlay */}
+                                <div className="absolute inset-0 -z-10">
+                                    <img 
+                                        src="https://images.unsplash.com/photo-1531206715517-5c0ba140b2b8?auto=format&fit=crop&q=80&w=2670"
+                                        alt="Cultural Understanding"
+                                        className="w-full h-full object-cover opacity-10"
+                                    />
+                                    <div className="absolute inset-0 bg-gradient-to-br from-indigo-900/90 via-purple-900/90 to-fuchsia-900/90" />
+                                </div>
+
+                                {/* Content */}
+                                <motion.div 
+                                    className="text-center mb-12 relative"
+                                    initial={{ y: -20, opacity: 0 }}
+                                    animate={{ y: 0, opacity: 1 }}
+                                >
+                                    <div className="flex items-center justify-center gap-4 mb-6">
+                                        <motion.div
+                                            className="icon-square"
+                                            animate={{
+                                                rotate: [0, 360],
+                                            }}
+                                            transition={{
+                                                duration: 20,
+                                                repeat: Infinity,
+                                                ease: "linear"
+                                            }}
+                                        >
+                                            <Icon name="globe" size={32} color="#818cf8" />
+                                        </motion.div>
+                                    </div>
+                                    <h2 className="text-6xl font-playfair mb-4 gradient-text glow">{slide.title}</h2>
+                                    <p className="text-xl text-gray-400 glass-effect inline-block px-6 py-2 rounded-full">{slide.subtitle}</p>
+                                </motion.div>
+
+                                <motion.div 
+                                    className="grid grid-cols-3 gap-8 max-w-7xl mx-auto"
+                                    variants={{
+                                        hidden: { opacity: 0 },
+                                        visible: { opacity: 1, transition: { staggerChildren: 0.2 } }
+                                    }}
+                                    initial="hidden"
+                                    animate="visible"
+                                >
+                                    {slide.items.map((item, index) => (
+                                        <motion.div
+                                            key={item.title}
+                                            className="culture-card p-8 hover:shadow-2xl relative group"
+                                            variants={{
+                                                hidden: { y: 20, opacity: 0 },
+                                                visible: { y: 0, opacity: 1 }
+                                            }}
+                                            whileHover={{ scale: 1.02 }}
+                                        >
+                                            {/* Card Background Image */}
+                                            <div className="absolute inset-0 -z-10 overflow-hidden rounded-2xl">
+                                                <motion.img 
+                                                    src={item.image}
+                                                    alt={item.title}
+                                                    className="w-full h-full object-cover opacity-20 transition-transform duration-700"
+                                                    initial={{ scale: 1 }}
+                                                    whileHover={{ scale: 1.1 }}
+                                                />
+                                                <div className="absolute inset-0 bg-gradient-to-b from-indigo-900/50 to-purple-900/50 backdrop-blur-sm" />
+                                            </div>
+
+                                            <motion.div
+                                                className="icon-box mb-6"
+                                                whileHover={{ rotate: 360, scale: 1.1 }}
+                                                transition={{ duration: 0.5 }}
+                                            >
+                                                <Icon name={item.icon} size={24} color="#818cf8" />
+                                            </motion.div>
+
+                                            <div className="relative z-10">
+                                                <h3 className="text-2xl font-semibold mb-4 gradient-text">{item.title}</h3>
+                                                <p className="text-gray-300 leading-relaxed">{item.description}</p>
+                                                
+                                                <motion.div
+                                                    className="mt-6 flex items-center gap-2 text-sm text-indigo-400 cursor-pointer hover-lift group"
+                                                    whileHover={{ x: 5 }}
+                                                >
+                                                    Learn more 
+                                                    <Icon name="arrow-right" size={16} />
+                                                </motion.div>
+                                            </div>
+
+                                            {/* Decorative Icon */}
+                                            <motion.div
+                                                className="absolute top-4 right-4 text-indigo-400/30"
+                                                animate={{
+                                                    rotate: [0, 360],
+                                                    scale: [1, 1.2, 1],
+                                                }}
+                                                transition={{
+                                                    duration: 5,
+                                                    repeat: Infinity,
+                                                    ease: "linear"
+                                                }}
+                                            >
+                                                <Icon name="sparkle" size={20} />
+                                            </motion.div>
+                                        </motion.div>
+                                    ))}
+                                </motion.div>
+                            </motion.div>
+                        );
+
+                    case 'barriers':
+                        return (
+                            <motion.div 
+                                className="h-screen w-screen flex flex-col justify-center p-8 relative overflow-hidden"
+                                initial={{ opacity: 0 }}
+                                animate={{ opacity: 1 }}
+                            >
+                                {/* Background Image with Overlay */}
+                                <div className="absolute inset-0 -z-10">
+                                    <img 
+                                        src="https://images.unsplash.com/photo-1573497019940-1c28c88b4f3e?auto=format&fit=crop&q=80&w=2670"
+                                        alt="Cultural Barriers"
+                                        className="w-full h-full object-cover opacity-10"
+                                    />
+                                    <div className="absolute inset-0 bg-gradient-to-br from-indigo-900/90 via-purple-900/90 to-fuchsia-900/90" />
+                                </div>
+
+                                {/* Content */}
+                                <motion.div 
+                                    className="text-center mb-12"
+                                    initial={{ y: -20, opacity: 0 }}
+                                    animate={{ y: 0, opacity: 1 }}
+                                >
+                                    <div className="flex items-center justify-center gap-4 mb-6">
+                                        <motion.div
+                                            className="icon-square"
+                                            animate={{
+                                                rotate: [0, 360],
+                                            }}
+                                            transition={{
+                                                duration: 20,
+                                                repeat: Infinity,
+                                                ease: "linear"
+                                            }}
+                                        >
+                                            <Icon name="prohibit" size={32} color="#818cf8" />
+                                        </motion.div>
+                                    </div>
+                                    <h2 className="text-6xl font-playfair mb-4 gradient-text glow">{slide.title}</h2>
+                                    <p className="text-xl text-gray-400 glass-effect inline-block px-6 py-2 rounded-full">{slide.subtitle}</p>
+                                </motion.div>
+
+                                <motion.div 
+                                    className="grid grid-cols-2 gap-6 max-w-7xl mx-auto"
+                                    variants={{
+                                        hidden: { opacity: 0 },
+                                        visible: { opacity: 1, transition: { staggerChildren: 0.15 } }
+                                    }}
+                                    initial="hidden"
+                                    animate="visible"
+                                >
+                                    {slide.items.map((item, index) => (
+                                        <motion.div
+                                            key={item.title}
+                                            className="culture-card p-6 flex items-start gap-4 relative group"
+                                            variants={{
+                                                hidden: { x: index % 2 === 0 ? -50 : 50, opacity: 0 },
+                                                visible: { x: 0, opacity: 1 }
+                                            }}
+                                        >
+                                            {/* Card Background Image */}
+                                            <div className="absolute inset-0 -z-10 overflow-hidden rounded-2xl">
+                                                <motion.img 
+                                                    src={item.image}
+                                                    alt={item.title}
+                                                    className="w-full h-full object-cover opacity-20 transition-transform duration-700"
+                                                    initial={{ scale: 1 }}
+                                                    whileHover={{ scale: 1.1 }}
+                                                />
+                                                <div className="absolute inset-0 bg-gradient-to-b from-purple-900/50 to-fuchsia-900/50 backdrop-blur-sm" />
+                                            </div>
+
+                                            <motion.div
+                                                className="icon-box flex-shrink-0 relative z-10"
+                                                whileHover={{ rotate: 360 }}
+                                                transition={{ duration: 0.5 }}
+                                            >
+                                                <Icon name={item.icon} size={24} color="#818cf8" />
+                                            </motion.div>
+
+                                            <div className="relative z-10">
+                                                <h3 className="text-xl font-semibold mb-2 gradient-text">{item.title}</h3>
+                                                <p className="text-gray-300">{item.description}</p>
+                                            </div>
+
+                                            {/* Decorative Icon */}
+                                            <motion.div
+                                                className="absolute top-4 right-4 text-purple-400/30"
+                                                animate={{
+                                                    rotate: [0, 360],
+                                                    scale: [1, 1.2, 1],
+                                                }}
+                                                transition={{
+                                                    duration: 5,
+                                                    repeat: Infinity,
+                                                    ease: "linear"
+                                                }}
+                                            >
+                                                <Icon name="sparkle" size={20} />
+                                            </motion.div>
+                                        </motion.div>
+                                    ))}
+                                </motion.div>
+                            </motion.div>
+                        );
+
+                    case 'competence':
+                        return (
+                            <motion.div 
+                                className="h-screen w-screen flex flex-col justify-center p-8 relative overflow-hidden"
+                                initial={{ opacity: 0 }}
+                                animate={{ opacity: 1 }}
+                            >
+                                {/* Modern Background */}
+                                <div className="absolute inset-0">
+                                    <div className="absolute inset-0 bg-gradient-to-br from-indigo-900/30 via-purple-900/20 to-fuchsia-900/30" />
+                                    <motion.div
+                                        className="absolute inset-0"
+                                        animate={{
+                                            background: [
+                                                'radial-gradient(circle at 0% 0%, rgba(99, 102, 241, 0.1) 0%, transparent 50%)',
+                                                'radial-gradient(circle at 100% 100%, rgba(99, 102, 241, 0.1) 0%, transparent 50%)',
+                                                'radial-gradient(circle at 0% 0%, rgba(99, 102, 241, 0.1) 0%, transparent 50%)',
+                                            ],
+                                        }}
+                                        transition={{
+                                            duration: 10,
+                                            repeat: Infinity,
+                                            ease: "easeInOut"
+                                        }}
+                                    />
+                                </div>
+
+                                {/* Content */}
+                                <motion.div 
+                                    className="text-center mb-12"
+                                    initial={{ y: -20, opacity: 0 }}
+                                    animate={{ y: 0, opacity: 1 }}
+                                >
+                                    <div className="flex items-center justify-center gap-4 mb-6">
+                                        <motion.div
+                                            className="icon-square"
+                                            animate={{
+                                                rotate: [0, 360],
+                                            }}
+                                            transition={{
+                                                duration: 20,
+                                                repeat: Infinity,
+                                                ease: "linear"
+                                            }}
+                                        >
+                                            <Icon name="brain" size={32} color="#818cf8" />
+                                        </motion.div>
+                                    </div>
+                                    <h2 className="text-6xl font-playfair mb-4 gradient-text glow">{slide.title}</h2>
+                                    <p className="text-xl text-gray-400 glass-effect inline-block px-6 py-2 rounded-full">{slide.subtitle}</p>
+                                </motion.div>
+
+                                <motion.div 
+                                    className="grid grid-cols-3 gap-8 max-w-7xl mx-auto"
+                                    variants={{
+                                        hidden: { opacity: 0 },
+                                        visible: { opacity: 1, transition: { staggerChildren: 0.2 } }
+                                    }}
+                                    initial="hidden"
+                                    animate="visible"
+                                >
+                                    {slide.items.map((item, index) => (
+                                        <motion.div
+                                            key={item.title}
+                                            className="culture-card p-8 hover:shadow-2xl"
+                                            variants={{
+                                                hidden: { y: 20, opacity: 0 },
+                                                visible: { y: 0, opacity: 1 }
+                                            }}
+                                            whileHover={{ scale: 1.02 }}
+                                        >
+                                            {/* Modern Background */}
+                                            <div className="absolute inset-0 -z-10">
+                                                <img 
+                                                    src={item.image} 
+                                                    className="w-full h-full object-cover opacity-20"
+                                                    alt={item.title}
+                                                />
+                                                <div className="absolute inset-0 bg-gradient-to-b from-[#0f172a]/50 to-[#0f172a]" />
+                                            </div>
+
+                                            <motion.div
+                                                className="icon-box mx-auto mb-6"
+                                                whileHover={{ rotate: 360, scale: 1.1 }}
+                                                transition={{ duration: 0.5 }}
+                                            >
+                                                <Icon name={item.icon} size={24} color="#818cf8" />
+                                            </motion.div>
+
+                                            <h3 className="text-2xl font-semibold mb-4 gradient-text">{item.title}</h3>
+                                            <p className="text-gray-400 leading-relaxed">{item.description}</p>
+
+                                            {/* Decorative Icon */}
+                                            <motion.div
+                                                className="absolute top-4 right-4 text-indigo-400/30"
+                                                animate={{
+                                                    rotate: [0, 360],
+                                                    scale: [1, 1.2, 1],
+                                                }}
+                                                transition={{
+                                                    duration: 5,
+                                                    repeat: Infinity,
+                                                    ease: "linear"
+                                                }}
+                                            >
+                                                <Icon name="sparkle" size={20} />
+                                            </motion.div>
+                                        </motion.div>
+                                    ))}
+                                </motion.div>
+                            </motion.div>
+                        );
+
+                    case 'interventions':
+                        return (
+                            <motion.div 
+                                className="h-screen w-screen flex flex-col justify-center p-8 relative overflow-hidden"
+                                initial={{ opacity: 0 }}
+                                animate={{ opacity: 1 }}
+                            >
+                                {/* Modern Background */}
+                                <div className="absolute inset-0">
+                                    <div className="absolute inset-0 bg-gradient-to-br from-indigo-900/30 via-purple-900/20 to-fuchsia-900/30" />
+                                    <motion.div
+                                        className="absolute inset-0"
+                                        animate={{
+                                            background: [
+                                                'radial-gradient(circle at 0% 0%, rgba(99, 102, 241, 0.1) 0%, transparent 50%)',
+                                                'radial-gradient(circle at 100% 100%, rgba(99, 102, 241, 0.1) 0%, transparent 50%)',
+                                                'radial-gradient(circle at 0% 0%, rgba(99, 102, 241, 0.1) 0%, transparent 50%)',
+                                            ],
+                                        }}
+                                        transition={{
+                                            duration: 10,
+                                            repeat: Infinity,
+                                            ease: "easeInOut"
+                                        }}
+                                    />
+                                </div>
+
+                                {/* Content */}
+                                <motion.div 
+                                    className="text-center mb-12"
+                                    initial={{ y: -20, opacity: 0 }}
+                                    animate={{ y: 0, opacity: 1 }}
+                                >
+                                    <div className="flex items-center justify-center gap-4 mb-6">
+                                        <motion.div
+                                            className="icon-square"
+                                            animate={{
+                                                rotate: [0, 360],
+                                            }}
+                                            transition={{
+                                                duration: 20,
+                                                repeat: Infinity,
+                                                ease: "linear"
+                                            }}
+                                        >
+                                            <Icon name="heartbeat" size={32} color="#818cf8" />
+                                        </motion.div>
+                                    </div>
+                                    <h2 className="text-6xl font-playfair mb-4 gradient-text glow">{slide.title}</h2>
+                                    <p className="text-xl text-gray-400 glass-effect inline-block px-6 py-2 rounded-full">{slide.subtitle}</p>
+                                </motion.div>
+
+                                <motion.div 
+                                    className="grid grid-cols-3 gap-8 max-w-7xl mx-auto"
+                                    variants={{
+                                        hidden: { opacity: 0 },
+                                        visible: { opacity: 1, transition: { staggerChildren: 0.2 } }
+                                    }}
+                                    initial="hidden"
+                                    animate="visible"
+                                >
+                                    {slide.items.map((item, index) => (
+                                        <motion.div
+                                            key={item.title}
+                                            className="culture-card p-8 hover:shadow-2xl"
+                                            variants={{
+                                                hidden: { y: 20, opacity: 0 },
+                                                visible: { y: 0, opacity: 1 }
+                                            }}
+                                            whileHover={{ scale: 1.02 }}
+                                        >
+                                            {/* Modern Background */}
+                                            <div className="absolute inset-0 -z-10">
+                                                <img 
+                                                    src={item.image} 
+                                                    className="w-full h-full object-cover opacity-20"
+                                                    alt={item.title}
+                                                />
+                                                <div className="absolute inset-0 bg-gradient-to-b from-[#0f172a]/50 to-[#0f172a]" />
+                                            </div>
+
+                                            <motion.div
+                                                className="icon-box mx-auto mb-6"
+                                                whileHover={{ rotate: 360, scale: 1.1 }}
+                                                transition={{ duration: 0.5 }}
+                                            >
+                                                <Icon name={item.icon} size={24} color="#818cf8" />
+                                            </motion.div>
+
+                                            <h3 className="text-2xl font-semibold mb-4 gradient-text">{item.title}</h3>
+                                            <p className="text-gray-400 leading-relaxed">{item.description}</p>
+
+                                            {/* Learn More Link */}
+                                            <motion.div
+                                                className="mt-6 flex items-center gap-2 text-sm text-indigo-400 cursor-pointer hover-lift group"
+                                                whileHover={{ x: 5 }}
+                                            >
+                                                Learn more 
+                                                <Icon name="arrow-right" size={16} />
+                                            </motion.div>
+
+                                            {/* Decorative Icon */}
+                                            <motion.div
+                                                className="absolute top-4 right-4 text-indigo-400/30"
+                                                animate={{
+                                                    rotate: [0, 360],
+                                                    scale: [1, 1.2, 1],
+                                                }}
+                                                transition={{
+                                                    duration: 5,
+                                                    repeat: Infinity,
+                                                    ease: "linear"
+                                                }}
+                                            >
+                                                <Icon name="sparkle" size={20} />
+                                            </motion.div>
+                                        </motion.div>
+                                    ))}
+                                </motion.div>
+                            </motion.div>
+                        );
+
+                    case 'outro':
+                        return (
+                            <motion.div 
+                                className="h-screen w-screen flex items-center justify-center relative overflow-hidden"
+                                initial={{ opacity: 0 }}
+                                animate={{ opacity: 1 }}
+                            >
+                                {/* Animated Background */}
+                                <div className="absolute inset-0">
+                                    <div className="absolute inset-0 bg-gradient-to-br from-indigo-900/30 via-purple-900/20 to-fuchsia-900/30" />
+                                    
+                                    {/* Animated Particles */}
+                                    {[...Array(20)].map((_, i) => (
+                                        <motion.div
+                                            key={i}
+                                            className="absolute w-2 h-2 rounded-full bg-gradient-to-r from-indigo-500 to-purple-500"
+                                            style={{
+                                                left: `${Math.random() * 100}%`,
+                                                top: `${Math.random() * 100}%`,
+                                            }}
+                                            animate={{
+                                                y: [0, -30, 0],
+                                                x: [0, Math.random() * 20 - 10, 0],
+                                                scale: [1, 1.2, 1],
+                                                opacity: [0.3, 0.6, 0.3],
+                                            }}
+                                            transition={{
+                                                duration: 3 + Math.random() * 2,
+                                                repeat: Infinity,
+                                                ease: "easeInOut"
+                                            }}
+                                        />
+                                    ))}
+                                </div>
+
+                                {/* Main Text Content */}
+                                <div className="relative z-10 text-center">
+                                    <motion.div
+                                        initial={{ y: 50, opacity: 0 }}
+                                        animate={{ y: 0, opacity: 1 }}
+                                        transition={{ duration: 1 }}
+                                        className="relative"
+                                    >
+                                        {/* Background Glow Effect */}
+                                        <motion.div
+                                            className="absolute -inset-20 bg-gradient-to-r from-indigo-500 to-purple-500 opacity-30 blur-3xl rounded-full"
+                                            animate={{
+                                                scale: [1, 1.2, 1],
+                                                opacity: [0.2, 0.3, 0.2],
+                                            }}
+                                            transition={{
+                                                duration: 4,
+                                                repeat: Infinity,
+                                                ease: "easeInOut"
+                                            }}
+                                        />
+
+                                        {/* Main Text */}
+                                        <motion.h1
+                                            className="text-8xl font-playfair font-bold relative"
+                                            style={{
+                                                background: 'linear-gradient(135deg, #6366f1 0%, #a855f7 50%, #ec4899 100%)',
+                                                WebkitBackgroundClip: 'text',
+                                                WebkitTextFillColor: 'transparent',
+                                                backgroundClip: 'text'
+                                            }}
+                                            animate={{
+                                                backgroundPosition: ['0% 50%', '100% 50%', '0% 50%'],
+                                            }}
+                                            transition={{
+                                                duration: 10,
+                                                repeat: Infinity,
+                                                ease: "easeInOut"
+                                            }}
+                                        >
+                                             Any Question
+                                        </motion.h1>
+
+                                        {/* Decorative Line */}
+                                        <motion.div
+                                            className="h-1 w-40 mx-auto mt-8 rounded-full bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500"
+                                            initial={{ width: 0, opacity: 0 }}
+                                            animate={{ width: 160, opacity: 1 }}
+                                            transition={{ delay: 0.5, duration: 1 }}
+                                        />
+                                    </motion.div>
+                                </div>
+
+                                {/* Bottom Gradient */}
+                                <motion.div
+                                    className="absolute bottom-0 left-0 w-full h-32 bg-gradient-to-t from-indigo-900/20 to-transparent"
+                                    animate={{
+                                        opacity: [0.2, 0.4, 0.2],
+                                    }}
+                                    transition={{
+                                        duration: 4,
+                                        repeat: Infinity,
+                                        ease: "easeInOut"
+                                    }}
+                                />
+                            </motion.div>
+                        );
+
+                    case 'thankyou':
+                        return (
+                            <motion.div 
+                                className="h-screen w-screen flex items-center justify-center relative overflow-hidden"
+                                initial={{ opacity: 0 }}
+                                animate={{ opacity: 1 }}
+                            >
+                                {/* Animated Background */}
+                                <div className="absolute inset-0">
+                                    <div className="absolute inset-0 bg-gradient-to-br from-indigo-900/30 via-purple-900/20 to-fuchsia-900/30" />
+                                    
+                                    {/* Animated Circles */}
+                                    {[...Array(3)].map((_, i) => (
+                                        <motion.div
+                                            key={i}
+                                            className="absolute rounded-full"
+                                            style={{
+                                                background: 'linear-gradient(135deg, #6366f1 0%, #a855f7 100%)',
+                                                width: `${300 + i * 100}px`,
+                                                height: `${300 + i * 100}px`,
+                                                left: '50%',
+                                                top: '50%',
+                                                transform: 'translate(-50%, -50%)',
+                                                opacity: 0.1 - i * 0.02,
+                                                filter: 'blur(40px)'
+                                            }}
+                                            animate={{
+                                                scale: [1, 1.2, 1],
+                                                rotate: [0, 180, 360]
+                                            }}
+                                            transition={{
+                                                duration: 10 + i * 2,
+                                                repeat: Infinity,
+                                                ease: "linear"
+                                            }}
+                                        />
+                                    ))}
+                                </div>
+
+                                {/* Content */}
+                                <div className="relative z-10">
+                                    <motion.div
+                                        className="text-center"
+                                        initial={{ scale: 0.5, opacity: 0 }}
+                                        animate={{ scale: 1, opacity: 1 }}
+                                        transition={{ duration: 0.8, ease: "easeOut" }}
+                                    >
+                                        {/* Heart Icon */}
+                                        <motion.div
+                                            className="mb-8 relative"
+                                            animate={{
+                                                scale: [1, 1.2, 1],
+                                            }}
+                                            transition={{
+                                                duration: 2,
+                                                repeat: Infinity,
+                                                ease: "easeInOut"
+                                            }}
+                                        >
+                                            <div className="relative">
+                                                <motion.div
+                                                    className="absolute inset-0 bg-gradient-to-r from-pink-500 to-purple-500 rounded-full blur-2xl opacity-30"
+                                                    animate={{
+                                                        scale: [1, 1.5, 1],
+                                                        opacity: [0.3, 0.5, 0.3]
+                                                    }}
+                                                    transition={{
+                                                        duration: 2,
+                                                        repeat: Infinity,
+                                                        ease: "easeInOut"
+                                                    }}
+                                                />
+                                                <Icon 
+                                                    name="heart" 
+                                                    size={80} 
+                                                    color="#ec4899"
+                                                    className="relative z-10"
+                                                />
+                                            </div>
+                                        </motion.div>
+
+                                        {/* Thank You Text */}
+                                        <motion.h1
+                                            className="text-9xl font-playfair font-bold mb-6"
+                                            style={{
+                                                background: 'linear-gradient(135deg, #6366f1 0%, #a855f7 50%, #ec4899 100%)',
+                                                WebkitBackgroundClip: 'text',
+                                                WebkitTextFillColor: 'transparent',
+                                                backgroundClip: 'text'
+                                            }}
+                                            animate={{
+                                                backgroundPosition: ['0% 50%', '100% 50%', '0% 50%'],
+                                            }}
+                                            transition={{
+                                                duration: 8,
+                                                repeat: Infinity,
+                                                ease: "easeInOut"
+                                            }}
+                                        >
+                                            Thank You
+                                        </motion.h1>
+
+                                        {/* Decorative Lines */}
+                                        <div className="flex justify-center gap-4 mt-12">
+                                            {[...Array(3)].map((_, i) => (
+                                                <motion.div
+                                                    key={i}
+                                                    className="h-1 w-16 rounded-full bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500"
+                                                    initial={{ width: 0, opacity: 0 }}
+                                                    animate={{ width: 64, opacity: 1 }}
+                                                    transition={{ 
+                                                        delay: 0.3 + i * 0.2, 
+                                                        duration: 0.8,
+                                                        ease: "easeOut"
+                                                    }}
+                                                />
+                                            ))}
+                                        </div>
+                                    </motion.div>
+                                </div>
+
+                                {/* Bottom Gradient */}
+                                <motion.div
+                                    className="absolute bottom-0 left-0 w-full h-32 bg-gradient-to-t from-indigo-900/20 to-transparent"
+                                    animate={{
+                                        opacity: [0.2, 0.4, 0.2],
+                                    }}
+                                    transition={{
+                                        duration: 4,
+                                        repeat: Infinity,
+                                        ease: "easeInOut"
+                                    }}
+                                />
+                            </motion.div>
+                        );
+
+                    default:
+                        return null;
+                }
+            };
+
+            return (
+                <div className="min-h-screen relative overflow-hidden bg-[#0f172a]">
+                    <AnimatePresence mode="wait">
+                        <motion.div
+                            key={currentSlide}
+                            initial={{ opacity: 0, x: 20 }}
+                            animate={{ opacity: 1, x: 0 }}
+                            exit={{ opacity: 0, x: -20 }}
+                            className="w-full"
+                        >
+                            {renderSlide(slides[currentSlide])}
+                        </motion.div>
+                    </AnimatePresence>
+
+                    {/* Navigation Buttons */}
+                    <div className="fixed bottom-8 right-8 flex gap-4">
+                        <motion.button
+                            className="px-6 py-3 rounded-full glass-effect text-white flex items-center gap-2"
+                            onClick={handlePrevious}
+                            disabled={currentSlide === 0}
+                            initial={{ opacity: 0 }}
+                            animate={{ 
+                                opacity: currentSlide === 0 ? 0.5 : 1,
+                                scale: 1
+                            }}
+                            whileHover={{ scale: 1.05 }}
+                            whileTap={{ scale: 0.95 }}
+                            style={{
+                                cursor: currentSlide === 0 ? 'not-allowed' : 'pointer'
+                            }}
+                        >
+                            <Icon name="arrow-left" size={20} /> Previous
+                        </motion.button>
+                        
+                        <motion.button
+                            className="px-6 py-3 rounded-full glass-effect text-white flex items-center gap-2"
+                            onClick={handleNext}
+                            disabled={currentSlide === slides.length - 1}
+                            initial={{ opacity: 0 }}
+                            animate={{ 
+                                opacity: currentSlide === slides.length - 1 ? 0.5 : 1,
+                                scale: 1
+                            }}
+                            whileHover={{ scale: 1.05 }}
+                            whileTap={{ scale: 0.95 }}
+                            style={{
+                                cursor: currentSlide === slides.length - 1 ? 'not-allowed' : 'pointer'
+                            }}
+                        >
+                            Next <Icon name="arrow-right" size={20} />
+                        </motion.button>
+                    </div>
+
+                    {/* Progress Dots */}
+                    <div className="fixed bottom-8 left-1/2 transform -translate-x-1/2 flex gap-2">
+                        {slides.map((_, index) => (
+                            <motion.div
+                                key={index}
+                                className="w-2 h-2 rounded-full cursor-pointer"
+                                style={{
+                                    background: index === currentSlide ? 
+                                        'linear-gradient(135deg, #6366f1, #a855f7)' : 
+                                        'rgba(255,255,255,0.2)'
+                                }}
+                                initial={{ scale: 0 }}
+                                animate={{ scale: 1 }}
+                                transition={{ delay: index * 0.1 }}
+                                onClick={() => setCurrentSlide(index)}
+                                whileHover={{ scale: 1.5 }}
+                            />
+                        ))}
+                    </div>
+                </div>
+            );
+        }
+
+        const root = ReactDOM.createRoot(document.getElementById('root'));
+        root.render(<CulturalDiversityPresentation />);
+    </script>
+</body>
+</html>
