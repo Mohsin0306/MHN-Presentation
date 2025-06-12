@@ -1,0 +1,1433 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Domains of Resilience</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+    <script src="https://unpkg.com/framer-motion@10.16.4/dist/framer-motion.js"></script>
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=Poppins:wght@300;400;500;600;700&display=swap');
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: #0f172a;
+            color: white;
+            overflow: hidden;
+            margin: 0;
+            padding: 0;
+            height: 100vh;
+            width: 100vw;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .container {
+            width: 100%;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem;
+            text-align: center;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 3rem;
+        }
+        .title-font {
+            font-family: 'Playfair Display', serif;
+        }
+        .domain-circle {
+            width: 180px;
+            height: 180px;
+            border-radius: 50%;
+            position: relative;
+            transition: all 0.8s ease;
+        }
+        .domain-circle.expanded {
+            width: 350px;
+            height: 350px;
+        }
+        .domain-circle::before {
+            content: '';
+            position: absolute;
+            top: -2px;
+            left: -2px;
+            right: -2px;
+            bottom: -2px;
+            border-radius: 50%;
+            background: conic-gradient(from 0deg, transparent 5%, currentColor 95%);
+            -webkit-mask: radial-gradient(circle at center, transparent 65%, black 66%);
+            mask: radial-gradient(circle at center, transparent 65%, black 66%);
+            animation: rotate 10s linear infinite;
+        }
+        @keyframes rotate {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+        .domain-physical { color: #1e40af; }
+        .domain-emotional { color: #fbbf24; }
+        .domain-spiritual { color: #15803d; }
+        .domain-mental { color: #ea580c; }
+        .typing-text {
+            display: inline-block;
+            white-space: pre-wrap;
+            border-right: 2px solid transparent;
+        }
+        .typing-text.typing::after {
+            content: '|';
+            animation: blink 1s step-end infinite;
+        }
+        @keyframes blink {
+            from, to { opacity: 1; }
+            50% { opacity: 0; }
+        }
+        .next-button {
+            position: fixed;
+            bottom: 40px;
+            right: 40px;
+            background: rgba(30, 41, 59, 0.8);
+            backdrop-filter: blur(8px);
+            padding: 15px 30px;
+            border-radius: 50px;
+            font-size: 18px;
+            transition: all 0.3s ease;
+            border: 1px solid rgba(59, 130, 246, 0.2);
+            color: #f8fafc;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        .next-button:hover {
+            background: rgba(30, 41, 59, 0.9);
+            transform: translateY(-2px);
+            border-color: rgba(59, 130, 246, 0.4);
+        }
+        .gradient-text {
+            background: linear-gradient(45deg, #1e40af, #3b82f6);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            display: inline-block;
+        }
+        .highlight-text {
+            color: #3b82f6;
+            font-size: 1.5rem;
+            max-width: 900px;
+        }
+        .intro-image {
+            position: relative;
+            width: 300px;
+            height: 300px;
+            margin: 0 auto;
+        }
+        .intro-image::before {
+            content: '';
+            position: absolute;
+            top: -30px;
+            left: -30px;
+            right: -30px;
+            bottom: -30px;
+            background: radial-gradient(circle at center, rgba(59, 130, 246, 0.1), transparent);
+            animation: pulse 3s infinite;
+            border-radius: 50%;
+        }
+        .intro-image svg {
+            width: 100%;
+            height: 100%;
+            transform: rotate(45deg);
+        }
+        @keyframes pulse {
+            0% { transform: scale(1); opacity: 0.3; }
+            50% { transform: scale(1.05); opacity: 0.5; }
+            100% { transform: scale(1); opacity: 0.3; }
+        }
+        .title {
+            color: #3b82f6;
+            font-size: 4.5rem;
+            font-weight: bold;
+            margin: 0;
+            font-family: 'Playfair Display', serif;
+            letter-spacing: -0.02em;
+        }
+        .main-text {
+            font-size: 2.5rem;
+            font-weight: 300;
+            color: #f8fafc;
+            max-width: 1000px;
+            line-height: 1.4;
+            margin: 0;
+            position: relative;
+        }
+        .main-text::after {
+            content: '';
+            position: absolute;
+            bottom: -15px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 100%;
+            height: 4px;
+            background: linear-gradient(90deg, transparent, #1e40af, transparent);
+            border-radius: 2px;
+        }
+        .sub-text {
+            font-size: 1.5rem;
+            color: #cbd5e1;
+            margin: 2rem 0;
+            font-weight: 300;
+        }
+        .fade-up {
+            animation: fadeUp 0.8s ease-out forwards;
+            opacity: 0;
+        }
+        @keyframes fadeUp {
+            from { 
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        .domains-container {
+            width: 100%;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem;
+            text-align: center;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 4rem;
+        }
+        .domains-heading {
+            color: white;
+            font-size: 4.5rem;
+            font-weight: bold;
+            font-family: 'Playfair Display', serif;
+            margin: 0;
+            letter-spacing: -0.02em;
+        }
+        .domains-grid {
+            display: flex;
+            gap: 6rem;
+            justify-content: center;
+            align-items: center;
+        }
+        .domain-circle {
+            width: 200px;
+            height: 200px;
+            border-radius: 50%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            transition: all 0.3s ease;
+        }
+        .domain-circle::before {
+            content: '';
+            position: absolute;
+            top: -2px;
+            left: -2px;
+            right: -2px;
+            bottom: -2px;
+            border-radius: 50%;
+            border: 2px solid currentColor;
+            opacity: 0.8;
+        }
+        .domain-circle i {
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+        }
+        .domain-title {
+            font-size: 1.75rem;
+            font-weight: 500;
+        }
+        .domain-physical { color: #1e40af; }
+        .domain-emotional { color: #fbbf24; }
+        .domain-spiritual { color: #15803d; }
+        .domain-mental { color: #ea580c; }
+        .nav-buttons {
+            position: fixed;
+            bottom: 40px;
+            right: 40px;
+            display: flex;
+            gap: 1rem;
+        }
+        .nav-button {
+            background: rgba(30, 41, 59, 0.8);
+            backdrop-filter: blur(8px);
+            padding: 15px 30px;
+            border-radius: 50px;
+            font-size: 18px;
+            transition: all 0.3s ease;
+            border: 1px solid rgba(59, 130, 246, 0.2);
+            color: #f8fafc;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        .nav-button:hover {
+            background: rgba(30, 41, 59, 0.9);
+            transform: translateY(-2px);
+            border-color: rgba(59, 130, 246, 0.4);
+        }
+        .nav-button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+        }
+        .domain-content {
+            max-width: 800px;
+            margin: 0 auto;
+            text-align: center;
+        }
+        .domain-description {
+            font-size: 1.5rem;
+            color: #f8fafc;
+            margin: 2rem 0;
+            line-height: 1.6;
+        }
+        .domain-points {
+            text-align: left;
+            margin-top: 2rem;
+        }
+        .domain-point {
+            display: flex;
+            align-items: start;
+            gap: 1rem;
+            margin-bottom: 1rem;
+            font-size: 1.25rem;
+            color: #e2e8f0;
+        }
+        .domain-point-bullet {
+            color: currentColor;
+            margin-top: 0.5rem;
+        }
+        .nursing-section {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem;
+            text-align: center;
+        }
+        .aspect-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 3rem;
+            margin: 4rem 0;
+        }
+        .aspect-card {
+            background: rgba(30, 41, 59, 0.3);
+            border-radius: 20px;
+            padding: 2rem;
+            text-align: left;
+            border: 1px solid rgba(59, 130, 246, 0.1);
+            transition: all 0.3s ease;
+        }
+        .aspect-card:hover {
+            border-color: rgba(59, 130, 246, 0.3);
+            transform: translateY(-5px);
+        }
+        .aspect-title {
+            color: #3b82f6;
+            font-size: 2rem;
+            font-weight: 600;
+            margin-bottom: 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+        .aspect-title i {
+            font-size: 1.75rem;
+        }
+        .aspect-list {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+            color: #e2e8f0;
+        }
+        .aspect-item {
+            display: flex;
+            align-items: start;
+            gap: 1rem;
+            margin-bottom: 1rem;
+            font-size: 1.2rem;
+            line-height: 1.6;
+        }
+        .aspect-item i {
+            color: #3b82f6;
+            margin-top: 0.4rem;
+        }
+        .section-title {
+            font-size: 3.5rem;
+            color: white;
+            font-family: 'Playfair Display', serif;
+            margin-bottom: 1rem;
+        }
+        .section-subtitle {
+            font-size: 1.5rem;
+            color: #94a3b8;
+            max-width: 800px;
+            margin: 0 auto 3rem;
+            line-height: 1.6;
+        }
+        .circle-container {
+            position: relative;
+            width: 600px;
+            height: 600px;
+            margin: 4rem auto;
+        }
+        
+        .center-text {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            text-align: center;
+            width: 200px;
+            font-family: 'Playfair Display', serif;
+            font-size: 1.8rem;
+            color: white;
+            z-index: 2;
+        }
+        
+        .aspect-circle {
+            position: absolute;
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            color: white;
+            border: none;
+        }
+        
+        .aspect-circle:hover {
+            transform: scale(1.1);
+            filter: brightness(1.1);
+        }
+        
+        .aspect-circle i {
+            font-size: 2rem;
+            margin-bottom: 0.5rem;
+            color: rgba(255, 255, 255, 0.9);
+        }
+        
+        .aspect-circle span {
+            font-size: 1.1rem;
+            text-align: center;
+            color: white;
+            font-weight: 500;
+        }
+        
+        .intro-text {
+            font-size: 2.5rem;
+            color: white;
+            text-align: center;
+            margin-bottom: 2rem;
+            font-family: 'Playfair Display', serif;
+        }
+        
+        .circle-bg {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 450px;
+            height: 450px;
+            border: 2px dashed rgba(255, 255, 255, 0.2);
+            border-radius: 50%;
+        }
+
+        /* Floating Bubbles Styles */
+        .importance-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            overflow: visible;
+            z-index: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding-top: 12vh;
+        }
+
+        .importance-title {
+            position: fixed;
+            z-index: 2;
+            text-align: center;
+            font-size: 4rem;
+            color: white;
+            font-family: 'Playfair Display', serif;
+            top: 2vh;
+            left: 0%;
+            transform: translateX(-50%);
+            text-shadow: 0 0 20px rgba(59, 130, 246, 0.3);
+            opacity: 0.9;
+            transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+            width: 100%;
+        }
+
+        .importance-title.blur {
+            opacity: 0.3;
+            filter: blur(3px);
+        }
+
+        .floating-bubble {
+            position: absolute;
+            padding: 2rem;
+            background: rgba(30, 41, 59, 0.85);
+            backdrop-filter: blur(12px);
+            border-radius: 20px;
+            color: white;
+            width: 250px;
+            height: auto;
+            text-align: center;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .floating-bubble:nth-child(1):not(.expanded) {
+            animation: float1 20s infinite ease-in-out;
+        }
+
+        .floating-bubble:nth-child(2):not(.expanded) {
+            animation: float2 25s infinite ease-in-out;
+        }
+
+        .floating-bubble:nth-child(3):not(.expanded) {
+            animation: float3 22s infinite ease-in-out;
+        }
+
+        .floating-bubble:not(.expanded):hover {
+            transform: scale(1.05) translateY(-10px);
+            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.3);
+            border-color: rgba(255, 255, 255, 0.2);
+        }
+
+        .floating-bubble .bubble-icon {
+            font-size: 2.5rem;
+            color: #60a5fa;
+            margin-bottom: 1rem;
+            display: block;
+        }
+
+        .floating-bubble .bubble-title {
+            font-size: 1.8rem;
+            font-weight: 600;
+            background: linear-gradient(135deg, #60a5fa, #3b82f6);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+
+        @keyframes float1 {
+            0%, 100% { transform: translate(0, 0) rotate(0deg); }
+            25% { transform: translate(100px, -50px) rotate(5deg); }
+            50% { transform: translate(50px, 100px) rotate(-3deg); }
+            75% { transform: translate(-50px, 50px) rotate(3deg); }
+        }
+
+        @keyframes float2 {
+            0%, 100% { transform: translate(0, 0) rotate(0deg); }
+            25% { transform: translate(-80px, 80px) rotate(-5deg); }
+            50% { transform: translate(60px, -60px) rotate(4deg); }
+            75% { transform: translate(-70px, -70px) rotate(-2deg); }
+        }
+
+        @keyframes float3 {
+            0%, 100% { transform: translate(0, 0) rotate(0deg); }
+            25% { transform: translate(70px, 70px) rotate(3deg); }
+            50% { transform: translate(-90px, -40px) rotate(-4deg); }
+            75% { transform: translate(40px, -90px) rotate(2deg); }
+        }
+
+        .floating-bubble.expanded {
+            width: 600px;
+            height: auto;
+            background: rgba(15, 23, 42, 0.95);
+            backdrop-filter: blur(16px);
+            padding: 2.5rem;
+            border-radius: 24px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            box-shadow: 
+                0 20px 40px rgba(0, 0, 0, 0.3),
+                0 0 80px rgba(59, 130, 246, 0.2);
+            transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+            position: fixed;
+            left: 50% !important;
+            top: 50% !important;
+            transform: translate(-50%, -50%) !important;
+            z-index: 1000;
+        }
+
+        .expanded .bubble-content {
+            opacity: 1;
+            height: auto;
+            margin-top: 1.5rem;
+        }
+
+        .expanded .bubble-title {
+            font-size: 2.2rem;
+            margin-bottom: 1rem;
+        }
+
+        .expanded .bubble-icon {
+            font-size: 3rem;
+            margin-bottom: 1.5rem;
+            color: #60a5fa;
+            background: rgba(96, 165, 250, 0.1);
+            padding: 1rem;
+            border-radius: 50%;
+            display: inline-block;
+        }
+
+        .bubble-text {
+            font-size: 1.2rem;
+            line-height: 1.6;
+            color: rgba(255, 255, 255, 0.9);
+            margin-bottom: 2rem;
+            text-align: left;
+        }
+
+        .bubble-details {
+            display: grid;
+            gap: 1rem;
+            padding: 1rem;
+            background: rgba(255, 255, 255, 0.03);
+            border-radius: 16px;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .bubble-detail-item {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            padding: 1rem;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 12px;
+            transition: all 0.3s ease;
+        }
+
+        .bubble-detail-item:hover {
+            background: rgba(255, 255, 255, 0.08);
+            transform: translateX(5px);
+        }
+
+        .bubble-detail-icon {
+            color: #60a5fa;
+            font-size: 1.25rem;
+            flex-shrink: 0;
+        }
+
+        .bubble-detail-text {
+            font-size: 1.1rem;
+            color: rgba(255, 255, 255, 0.9);
+            line-height: 1.4;
+        }
+
+        /* New styles for benefit cards */
+        .benefit-card {
+            background: rgba(30, 41, 59, 0.85);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            padding: 2.5rem;
+            border-radius: 24px;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            backdrop-filter: blur(12px);
+            text-align: center;
+        }
+
+        .benefit-card:hover {
+            transform: translateY(-5px);
+            background: rgba(30, 41, 59, 0.95);
+            border-color: rgba(255, 255, 255, 0.2);
+            box-shadow: 
+                0 20px 40px rgba(0, 0, 0, 0.3),
+                0 0 80px rgba(59, 130, 246, 0.2);
+        }
+
+        .benefit-card i {
+            display: inline-block;
+            padding: 1rem;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.05);
+            margin-bottom: 1.5rem;
+        }
+
+        .benefit-card h3 {
+            background: linear-gradient(135deg, #60a5fa, #3b82f6);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            font-weight: 600;
+        }
+
+        .benefit-card p {
+            font-size: 1.1rem;
+            line-height: 1.6;
+            color: rgba(255, 255, 255, 0.9);
+        }
+    </style>
+</head>
+<body>
+    <div id="root"></div>
+    <script type="text/babel">
+        const { motion, AnimatePresence } = window.Motion;
+        
+        function TypeWriter({ text, className = "", delay = 30 }) {
+            const [displayedText, setDisplayedText] = React.useState("");
+            const [isTyping, setIsTyping] = React.useState(true);
+            
+            React.useEffect(() => {
+                let i = 0;
+                setDisplayedText("");
+                setIsTyping(true);
+                
+                const timer = setInterval(() => {
+                    if (i < text.length) {
+                        setDisplayedText(prev => prev + text[i]);
+                        i++;
+                    } else {
+                        setIsTyping(false);
+                        clearInterval(timer);
+                    }
+                }, delay);
+                
+                return () => clearInterval(timer);
+            }, [text]);
+            
+            return (
+                <span className={`typing-text ${isTyping ? 'typing' : ''} ${className}`}>
+                    {displayedText}
+                </span>
+            );
+        }
+
+        function IntroImage() {
+            return (
+                <div className="intro-image">
+                    <svg viewBox="0 0 500 500" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        {/* Outer circle with dashed line */}
+                        <circle 
+                            cx="250" 
+                            cy="250" 
+                            r="200" 
+                            stroke="#1e40af" 
+                            strokeWidth="2"
+                            strokeDasharray="4 4"
+                        />
+                        
+                        {/* Middle circle with solid line */}
+                        <circle 
+                            cx="250" 
+                            cy="250" 
+                            r="150" 
+                            stroke="#3b82f6" 
+                            strokeWidth="2"
+                        />
+                        
+                        {/* Inner circle with lighter blue */}
+                        <circle 
+                            cx="250" 
+                            cy="250" 
+                            r="100" 
+                            stroke="#60a5fa" 
+                            strokeWidth="2"
+                        />
+                        
+                        {/* Diagonal line representing resilience path */}
+                        <line 
+                            x1="100" 
+                            y1="100" 
+                            x2="400" 
+                            y2="400" 
+                            stroke="#3b82f6" 
+                            strokeWidth="2" 
+                            strokeDasharray="8 8"
+                        >
+                            <animate 
+                                attributeName="stroke-dashoffset" 
+                                from="0" 
+                                to="100" 
+                                dur="3s" 
+                                repeatCount="indefinite"
+                            />
+                        </line>
+                    </svg>
+                </div>
+            );
+        }
+
+        function NursingResilience() {
+            const aspects = [
+                { 
+                    title: "Coping Stress", 
+                    icon: "ph-meditation", 
+                    color: "#93c5fd", // Light blue
+                    top: "5%", 
+                    left: "43%" 
+                },
+                { 
+                    title: "Emotional Regulation", 
+                    icon: "ph-heart", 
+                    color: "#f472b6", // Pink
+                    top: "30%", 
+                    right: "5%" 
+                },
+
+                { 
+                    title: "Self-Care", 
+                    icon: "ph-heart", 
+                    color: "#86efac", // Mint green
+                    bottom: "13%", 
+                    right: "15%" 
+                },
+                { 
+                    title: "Support System", 
+                    icon: "ph-users-three", 
+                    color: "#fcd34d", // Yellow
+                    bottom: "15%", 
+                    left: "13%" 
+                },
+                { 
+                    title: "Balance Boundaries", 
+                    icon: "ph-scales", 
+                    color: "#fdba74", // Orange
+                    top: "25%", 
+                    left: "10%" 
+                }
+            ];
+
+            return (
+                <motion.div 
+                    className="nursing-section"
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    exit={{ opacity: 0 }}
+                >
+                    <motion.h1
+                        className="intro-text"
+                        initial={{ y: 20, opacity: 0 }}
+                        animate={{ y: 0, opacity: 1 }}
+                        transition={{ duration: 0.8 }}
+                    >
+                        Resilience in mental health nursing refers to the ability of nurses to:
+                    </motion.h1>
+
+                    <div className="circle-container">
+                        <div className="circle-bg" />
+                        <div className="center-text">
+                            Key<br/>Aspects
+                        </div>
+                        
+                        {aspects.map((aspect, index) => (
+                            <motion.div
+                                key={aspect.title}
+                                className="aspect-circle"
+                                style={{
+                                    backgroundColor: aspect.color,
+                                    ...Object.fromEntries(
+                                        Object.entries({ top: aspect.top, left: aspect.left, right: aspect.right, bottom: aspect.bottom })
+                                            .filter(([_, value]) => value !== undefined)
+                                    ),
+                                    transform: 'translate(-50%, -50%)'
+                                }}
+                                initial={{ scale: 0, opacity: 0 }}
+                                animate={{ scale: 1, opacity: 1 }}
+                                transition={{ delay: index * 0.2, type: "spring" }}
+                                whileHover={{ scale: 1.1 }}
+                            >
+                                <i className={aspect.icon}></i>
+                                <span>{aspect.title}</span>
+                            </motion.div>
+                        ))}
+                    </div>
+                </motion.div>
+            );
+        }
+
+        function ImportanceSection({ expandedBubble, setExpandedBubble }) {
+            const [showDetails, setShowDetails] = React.useState(false);
+            const bubbleOrder = ['patient-care', 'burnout', 'satisfaction'];
+
+            const handleNextBubble = () => {
+                if (!expandedBubble) {
+                    setExpandedBubble('patient-care');
+                } else {
+                    const currentIndex = bubbleOrder.indexOf(expandedBubble);
+                    if (currentIndex < bubbleOrder.length - 1) {
+                        setShowDetails(false);
+                        setTimeout(() => {
+                            setExpandedBubble(bubbleOrder[currentIndex + 1]);
+                        }, 500);
+                    } else {
+                        setShowDetails(false);
+                        setTimeout(() => {
+                            setExpandedBubble(null);
+                        }, 500);
+                    }
+                }
+            };
+
+            const handlePreviousBubble = () => {
+                if (!expandedBubble) {
+                    setExpandedBubble(bubbleOrder[bubbleOrder.length - 1]);
+                } else {
+                    const currentIndex = bubbleOrder.indexOf(expandedBubble);
+                    if (currentIndex > 0) {
+                        setShowDetails(false);
+                        setTimeout(() => {
+                            setExpandedBubble(bubbleOrder[currentIndex - 1]);
+                        }, 500);
+                    } else {
+                        setShowDetails(false);
+                        setTimeout(() => {
+                            setExpandedBubble(null);
+                        }, 500);
+                    }
+                }
+            };
+
+            React.useEffect(() => {
+                if (expandedBubble) {
+                    setTimeout(() => setShowDetails(true), 500);
+                } else {
+                    setShowDetails(false);
+                }
+            }, [expandedBubble]);
+
+            const importancePoints = [
+                {
+                    id: 'patient-care',
+                    title: "Patient Care",
+                    icon: "ph-heart",
+                    fullText: "Improved patient care: Resilient nurses provide more compassionate and effective care.",
+                    details: [
+                        "Enhanced quality of care delivery",
+                        "Better patient outcomes and satisfaction",
+                        "More attentive and focused care",
+                        "Improved patient communication",
+                        "Greater empathy and understanding"
+                    ],
+                    style: { top: "15%", left: "15%" },
+                    color: "rgba(59, 130, 246, 0.15)"
+                },
+                {
+                    id: 'burnout',
+                    title: "Reduced Burnout",
+                    icon: "ph-battery-charging",
+                    fullText: "Reduced burnout: Resilience helps nurses manage stress and prevent emotional exhaustion.",
+                    details: [
+                        "Better stress management",
+                        "Improved work-life balance",
+                        "Enhanced emotional regulation",
+                        "Increased energy levels",
+                        "Better coping mechanisms"
+                    ],
+                    style: { top: "25%", right: "20%" },
+                    color: "rgba(252, 211, 77, 0.15)"
+                },
+                {
+                    id: 'satisfaction',
+                    title: "Job Satisfaction",
+                    icon: "ph-smiley",
+                    fullText: "Increased job satisfaction: Resilient nurses experience greater fulfillment and career engagement.",
+                    details: [
+                        "Higher job satisfaction levels",
+                        "Increased career longevity",
+                        "Better team relationships",
+                        "Greater sense of purpose",
+                        "Enhanced professional growth"
+                    ],
+                    style: { bottom: "30%", left: "25%" },
+                    color: "rgba(134, 239, 172, 0.15)"
+                }
+            ];
+
+            return (
+                <motion.div
+                    className="nursing-section"
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    exit={{ opacity: 0 }}
+                    style={{ 
+                        height: '100vh',
+                        width: '100vw',
+                        position: 'fixed',
+                        top: 0,
+                        left: 0,
+                        display: 'flex',
+                        flexDirection: 'column',
+                        alignItems: 'center',
+                        overflow: 'hidden'
+                    }}
+                >
+                    <motion.h1 
+                        className={`importance-title ${expandedBubble ? 'blur' : ''}`}
+                        initial={{ y: -20, opacity: 0 }}
+                        animate={{ y: 0, opacity: 0.9 }}
+                        transition={{ duration: 0.8 }}
+                    >
+                        Importance
+                    </motion.h1>
+
+                    <div className="importance-container">
+                        {importancePoints.map((point, index) => (
+                            <motion.div
+                                key={point.id}
+                                className={`floating-bubble ${expandedBubble === point.id ? 'expanded' : ''}`}
+                                style={{
+                                    ...(!expandedBubble || expandedBubble !== point.id ? point.style : {}),
+                                    position: expandedBubble === point.id ? 'fixed' : 'absolute',
+                                    background: expandedBubble === point.id ? 'rgba(15, 23, 42, 0.95)' : 'rgba(30, 41, 59, 0.85)',
+                                }}
+                                initial={{ opacity: 0, scale: 0.8 }}
+                                animate={{ 
+                                    opacity: expandedBubble && expandedBubble !== point.id ? 0.3 : 1,
+                                    scale: 1,
+                                    filter: expandedBubble && expandedBubble !== point.id ? 'blur(3px)' : 'none'
+                                }}
+                                transition={{
+                                    type: "spring",
+                                    stiffness: 100,
+                                    damping: 15
+                                }}
+                                onClick={() => !expandedBubble && setExpandedBubble(point.id)}
+                            >
+                                <i className={`${point.icon} bubble-icon`}></i>
+                                <div className="bubble-title">{point.title}</div>
+                                {expandedBubble === point.id && (
+                                    <motion.div 
+                                        className="bubble-content"
+                                        initial={{ opacity: 0, y: 20 }}
+                                        animate={{ opacity: 1, y: 0 }}
+                                        transition={{ delay: 0.2 }}
+                                    >
+                                        <p className="bubble-text">{point.fullText}</p>
+                                        <div className="bubble-details">
+                                            {point.details?.map((detail, i) => (
+                                                <motion.div 
+                                                    key={i}
+                                                    className="bubble-detail-item"
+                                                    initial={{ opacity: 0, x: -20 }}
+                                                    animate={{ opacity: 1, x: 0 }}
+                                                    transition={{ delay: 0.3 + (i * 0.1) }}
+                                                >
+                                                    <i className="ph ph-check-circle bubble-detail-icon"></i>
+                                                    <span className="bubble-detail-text">{detail}</span>
+                                                </motion.div>
+                                            ))}
+                                        </div>
+                                    </motion.div>
+                                )}
+                            </motion.div>
+                        ))}
+                    </div>
+                </motion.div>
+            );
+        }
+
+        function BenefitsSection() {
+            const handleFinishClick = () => {
+                window.location.href = 'Complementary-presentation.html';
+            };
+
+            return (
+                <motion.div
+                    className="benefits-section"
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    exit={{ opacity: 0 }}
+                    style={{ 
+                        height: '100vh',
+                        width: '100vw',
+                        position: 'fixed',
+                        top: 0,
+                        left: 0,
+                        display: 'flex',
+                        flexDirection: 'column',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        background: 'rgba(15, 23, 42, 0.95)',
+                        backdropFilter: 'blur(16px)',
+                        padding: '2rem'
+                    }}
+                >
+                    <motion.h1
+                        className="title-font text-5xl mb-12"
+                        initial={{ y: -20, opacity: 0 }}
+                        animate={{ y: 0, opacity: 1 }}
+                        transition={{ duration: 0.8 }}
+                    >
+                        Strategies for Building Resilience
+                    </motion.h1>
+
+                    <div className="grid grid-cols-2 gap-8 max-w-6xl">
+                        <motion.div
+                            className="benefit-card"
+                            initial={{ x: -50, opacity: 0 }}
+                            animate={{ x: 0, opacity: 1 }}
+                            transition={{ delay: 0.3 }}
+                        >
+                            <i className="ph ph-heart text-4xl text-blue-400 mb-4"></i>
+                            <h3 className="text-2xl font-semibold mb-4">Self-care Practices</h3>
+                            <p className="text-gray-300">Engaging in activities that promote relaxation and stress reduction.</p>
+                            <h3 className="text-2xl font-semibold mb-4">Enhanced Patient Care</h3>
+                            <p className="text-gray-300">Resilient nurses provide better care through improved focus and emotional stability.</p>
+                        </motion.div>
+
+                        <motion.div
+                            className="benefit-card"
+                            initial={{ x: 50, opacity: 0 }}
+                            animate={{ x: 0, opacity: 1 }}
+                            transition={{ delay: 0.4 }}
+                        >
+                            <i className="ph ph-brain text-4xl text-yellow-400 mb-4"></i>
+                            <h3 className="text-2xl font-semibold mb-4">Mental Wellbeing</h3>
+                            <p className="text-gray-300">Better stress management and emotional regulation in challenging situations.</p>
+                        </motion.div>
+
+                        <motion.div
+                            className="benefit-card"
+                            initial={{ x: -50, opacity: 0 }}
+                            animate={{ x: 0, opacity: 1 }}
+                            transition={{ delay: 0.5 }}
+                        >
+                            <i className="ph ph-users-three text-4xl text-green-400 mb-4"></i>
+                            <h3 className="text-2xl font-semibold mb-4">Team Dynamics</h3>
+                            <p className="text-gray-300">Improved collaboration and support among healthcare professionals.</p>
+                        </motion.div>
+
+                        <motion.div
+                            className="benefit-card"
+                            initial={{ x: 50, opacity: 0 }}
+                            animate={{ x: 0, opacity: 1 }}
+                            transition={{ delay: 0.6 }}
+                        >
+                            <i className="ph ph-chart-line-up text-4xl text-purple-400 mb-4"></i>
+                            <h3 className="text-2xl font-semibold mb-4">Career Growth</h3>
+                            <p className="text-gray-300">Enhanced professional development and leadership opportunities.</p>
+                        </motion.div>
+                    </div>
+
+                    <motion.button
+                        className="fixed bottom-8 right-8 px-8 py-4 rounded-full text-white text-lg font-medium"
+                        onClick={handleFinishClick}
+                        initial={{ scale: 0.9 }}
+                        animate={{ scale: 1 }}
+                        whileHover={{ scale: 1.05 }}
+                        whileTap={{ scale: 0.95 }}
+                        style={{
+                            background: 'linear-gradient(135deg, #e879f9, #818cf8)',
+                            border: 'none',
+                            boxShadow: '0 4px 20px rgba(0, 0, 0, 0.1)'
+                        }}
+                    >
+                        Continue to Complementary Therapies <i className="ph ph-arrow-right ml-2"></i>
+                    </motion.button>
+                </motion.div>
+            );
+        }
+
+        function Presentation() {
+            const [currentSlide, setCurrentSlide] = React.useState('intro');
+            const [isShowingAll, setIsShowingAll] = React.useState(false);
+            const [currentDomain, setCurrentDomain] = React.useState(0);
+            const [showNursing, setShowNursing] = React.useState(false);
+            const [showImportance, setShowImportance] = React.useState(false);
+            const [showBenefits, setShowBenefits] = React.useState(false);
+            const [expandedBubble, setExpandedBubble] = React.useState(null);
+            const [showComplementary, setShowComplementary] = React.useState(false);
+            
+            const domains = [
+                {
+                    id: 'physical',
+                    title: "Physical",
+                    icon: "ph ph-brain",
+                    colorClass: "domain-physical",
+                    description: "Physical resilience encompasses our body's ability to adapt and recover from challenges. It includes:",
+                    points: [
+                        "Physical Flexibility: Ability to adapt to physical demands",
+                        "Endurance: Sustained physical and mental effort",
+                        "Strength: Both muscular and overall bodily resilience"
+                    ]
+                },
+                {
+                    id: 'emotional',
+                    title: "Emotional",
+                    icon: "ph ph-heart",
+                    colorClass: "domain-emotional",
+                    description: "Emotional resilience is our capacity to adapt to stressful situations and cope with life's ups and downs. It includes:",
+                    points: [
+                        "Self-awareness: Understanding and managing our emotions",
+                        "Adaptability: Flexible response to emotional challenges",
+                        "Emotional Balance: Maintaining stability during stress"
+                    ]
+                },
+                {
+                    id: 'spiritual',
+                    title: "Spiritual",
+                    icon: "ph ph-spiral",
+                    colorClass: "domain-spiritual",
+                    description: "Spiritual resilience connects us to deeper meaning and purpose in life. It encompasses:",
+                    points: [
+                        "Purpose: Clear sense of meaning and direction",
+                        "Values: Strong personal beliefs and principles",
+                        "Connection: Relationship with something greater than self"
+                    ]
+                },
+                {
+                    id: 'mental',
+                    title: "Mental",
+                    icon: "ph ph-lightbulb",
+                    colorClass: "domain-mental",
+                    description: "Mental resilience is our cognitive ability to adapt to challenges and maintain clarity. It includes:",
+                    points: [
+                        "Problem-solving: Creative approaches to challenges",
+                        "Focus: Maintaining attention and mental clarity",
+                        "Learning: Growing from experiences and adaptation"
+                    ]
+                }
+            ];
+
+            const handleNext = () => {
+                if (currentSlide === 'intro') {
+                    setCurrentSlide('domains');
+                    setIsShowingAll(true);
+                } else if (isShowingAll) {
+                    setIsShowingAll(false);
+                } else if (currentDomain < domains.length - 1) {
+                    setCurrentDomain(prev => prev + 1);
+                } else if (currentDomain === domains.length - 1 && !showNursing) {
+                    setShowNursing(true);
+                } else if (showNursing && !showImportance) {
+                    setShowNursing(false);
+                    setShowImportance(true);
+                } else if (showImportance) {
+                    if (!expandedBubble) {
+                        setExpandedBubble('patient-care');
+                    } else {
+                        const bubbleOrder = ['patient-care', 'burnout', 'satisfaction'];
+                        const currentIndex = bubbleOrder.indexOf(expandedBubble);
+                        if (currentIndex < bubbleOrder.length - 1) {
+                            setExpandedBubble(bubbleOrder[currentIndex + 1]);
+                        } else {
+                            setExpandedBubble(null);
+                            setShowBenefits(true);
+                        }
+                    }
+                }
+            };
+
+            const handlePrevious = () => {
+                if (showBenefits) {
+                    setShowBenefits(false);
+                    setShowImportance(true);
+                    setExpandedBubble('satisfaction');
+                } else if (showImportance) {
+                    if (expandedBubble) {
+                        const bubbleOrder = ['patient-care', 'burnout', 'satisfaction'];
+                        const currentIndex = bubbleOrder.indexOf(expandedBubble);
+                        if (currentIndex > 0) {
+                            setExpandedBubble(bubbleOrder[currentIndex - 1]);
+                        } else {
+                            setExpandedBubble(null);
+                        }
+                    } else {
+                        setShowImportance(false);
+                        setShowNursing(true);
+                    }
+                } else if (showNursing) {
+                    setShowNursing(false);
+                    setCurrentDomain(domains.length - 1);
+                } else if (!isShowingAll && currentDomain > 0) {
+                    setCurrentDomain(prev => prev - 1);
+                } else if (!isShowingAll) {
+                    setIsShowingAll(true);
+                } else if (currentSlide !== 'intro') {
+                    setCurrentSlide('intro');
+                }
+            };
+
+            return (
+                <div className="container">
+                    <AnimatePresence mode="wait">
+                        {currentSlide === 'intro' ? (
+                            <motion.div
+                                key="intro"
+                                initial={{ opacity: 0 }}
+                                animate={{ opacity: 1 }}
+                                exit={{ opacity: 0 }}
+                                className="flex flex-col items-center gap-8"
+                            >
+                                <motion.div
+                                    initial={{ scale: 0 }}
+                                    animate={{ scale: 1 }}
+                                    transition={{ type: "spring", stiffness: 100 }}
+                                >
+                                    <IntroImage />
+                                </motion.div>
+                                
+                                <motion.h1 
+                                    className="title"
+                                    initial={{ y: 20, opacity: 0 }}
+                                    animate={{ y: 0, opacity: 1 }}
+                                    transition={{ delay: 0.5 }}
+                                >
+                                    What is Resilience?
+                                </motion.h1>
+                                
+                                <motion.p 
+                                    className="main-text"
+                                    initial={{ y: 20, opacity: 0 }}
+                                    animate={{ y: 0, opacity: 1 }}
+                                    transition={{ delay: 0.8 }}
+                                >
+                                    Resilience is the capacity to recover, adapt, and thrive in the face of adversity.
+                                </motion.p>
+                                
+                                <motion.p
+                                    className="sub-text"
+                                    initial={{ opacity: 0 }}
+                                    animate={{ opacity: 1 }}
+                                    transition={{ delay: 1.2 }}
+                                >
+                                    It's our ability to bounce back from challenges, learn from experiences,
+                                    <br />and emerge stronger than before.
+                                </motion.p>
+
+                            </motion.div>
+                        ) : showBenefits ? (
+                            <BenefitsSection />
+                        ) : showImportance ? (
+                            <ImportanceSection 
+                                expandedBubble={expandedBubble} 
+                                setExpandedBubble={setExpandedBubble}
+                            />
+                        ) : showNursing ? (
+                            <NursingResilience />
+                        ) : isShowingAll ? (
+                            <motion.div
+                                key="domains"
+                                className="domains-container"
+                                initial={{ opacity: 0 }}
+                                animate={{ opacity: 1 }}
+                                exit={{ opacity: 0 }}
+                            >
+                                <motion.h1 
+                                    className="domains-heading"
+                                    initial={{ y: -20, opacity: 0 }}
+                                    animate={{ y: 0, opacity: 1 }}
+                                    transition={{ duration: 0.6 }}
+                                >
+                                    Domains of Resilience
+                                </motion.h1>
+
+                                <motion.div 
+                                    className="domains-grid"
+                                    initial={{ y: 20, opacity: 0 }}
+                                    animate={{ y: 0, opacity: 1 }}
+                                    transition={{ delay: 0.3 }}
+                                >
+                                    {domains.map((domain, index) => (
+                                        <motion.div
+                                            key={domain.id}
+                                            className={`domain-circle domain-${domain.id}`}
+                                            initial={{ scale: 0, rotate: -180 }}
+                                            animate={{ scale: 1, rotate: 0 }}
+                                            transition={{
+                                                type: "spring",
+                                                stiffness: 100,
+                                                delay: index * 0.15
+                                            }}
+                                            whileHover={{ scale: 1.05 }}
+                                        >
+                                            <i className={domain.icon}></i>
+                                            <span className="domain-title">{domain.title}</span>
+                                        </motion.div>
+                                    ))}
+                                </motion.div>
+                            </motion.div>
+                        ) : (
+                            <motion.div
+                                key="single-domain"
+                                className="w-full flex flex-col items-center"
+                                initial={{ opacity: 0, scale: 0.8 }}
+                                animate={{ opacity: 1, scale: 1 }}
+                                exit={{ opacity: 0, scale: 0.8 }}
+                            >
+                                <div className={`domain-circle expanded ${domains[currentDomain].colorClass} flex items-center justify-center mb-12`}>
+                                    <div className="text-center z-10">
+                                        <h2 className="title-font text-5xl font-semibold mb-4">{domains[currentDomain].title}</h2>
+                                        <i className={`${domains[currentDomain].icon} text-5xl`}></i>
+                                    </div>
+                                </div>
+                                
+                                <div className="text-content max-w-4xl mx-auto text-xl space-y-6">
+                                    <TypeWriter 
+                                        text={domains[currentDomain].description}
+                                        className="block text-gray-200 mb-6"
+                                    />
+                                    <div className="space-y-3">
+                                        {domains[currentDomain].points?.map((point, index) => (
+                                            <motion.div
+                                                key={index}
+                                                initial={{ opacity: 0, x: -20 }}
+                                                animate={{ opacity: 1, x: 0 }}
+                                                transition={{ delay: (domains[currentDomain].description.length * 0.03) + (index * 0.5) }}
+                                                className="flex items-start gap-4"
+                                            >
+                                                <span className="text-blue-500 mt-1">•</span>
+                                                <TypeWriter 
+                                                    text={point}
+                                                    delay={40}
+                                                    className="text-gray-300"
+                                                />
+                                            </motion.div>
+                                        ))}
+                                    </div>
+                                </div>
+                            </motion.div>
+                        )}
+                    </AnimatePresence>
+
+                    {!showBenefits && (
+                        <div className="nav-buttons">
+                            <motion.button
+                                className="nav-button"
+                                onClick={handlePrevious}
+                                whileHover={{ scale: 1.05 }}
+                                whileTap={{ scale: 0.95 }}
+                                disabled={currentSlide === 'intro'}
+                            >
+                                <i className="ph ph-arrow-left"></i> Previous
+                            </motion.button>
+                            <motion.button
+                                className="nav-button"
+                                onClick={handleNext}
+                                whileHover={{ scale: 1.05 }}
+                                whileTap={{ scale: 0.95 }}
+                            >
+                                Next <i className="ph ph-arrow-right"></i>
+                            </motion.button>
+                        </div>
+                    )}
+                </div>
+            );
+        }
+
+        ReactDOM.render(<Presentation />, document.getElementById('root'));
+    </script>
+</body>
+</html>
