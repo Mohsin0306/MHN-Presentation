@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Resilience in Mental Health Nursing</title>
+    <title>Mental Health Nursing Presentation</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
     <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
@@ -34,7 +34,7 @@
             color: transparent;
         }
 
-        .presenter-card {
+        .member-card {
             background: rgba(30, 41, 59, 0.3);
             backdrop-filter: blur(12px);
             border: 1px solid rgba(255, 255, 255, 0.05);
@@ -42,50 +42,105 @@
             transform-style: preserve-3d;
             perspective: 1000px;
             height: fit-content;
+            position: relative;
+            overflow: hidden;
         }
 
-        .presenter-card:hover {
-            transform: translateY(-10px) rotateX(5deg) rotateY(5deg);
+        .member-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(45deg, transparent, rgba(255, 255, 255, 0.1), transparent);
+            transform: translateX(-100%);
+            transition: 0.5s;
+        }
+
+        .member-card:hover::before {
+            transform: translateX(100%);
+        }
+
+        .member-card:hover {
+            transform: translateY(-5px) rotateX(5deg) rotateY(5deg);
             border-color: rgba(96, 165, 250, 0.2);
             box-shadow: 
                 0 25px 50px rgba(0, 0, 0, 0.3),
                 0 0 100px rgba(96, 165, 250, 0.1);
         }
 
-        .presenter-image-container {
-            position: relative;
-            transform-style: preserve-3d;
-            transition: transform 0.5s ease;
-        }
-
-        .presenter-card:hover .presenter-image-container {
-            transform: translateZ(20px);
-        }
-
-        .presenter-image {
-            width: 80px !important;
-            height: 80px !important;
+        .member-icon {
+            width: 80px;
+            height: 80px;
             border-radius: 50%;
-            border: 3px solid transparent;
-            background: linear-gradient(#0a0f1c, #0a0f1c) padding-box,
-                        linear-gradient(135deg, #60a5fa, #818cf8, #c084fc) border-box;
+            background: linear-gradient(135deg, #60a5fa, #818cf8, #c084fc);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto;
+            transition: all 0.3s ease;
             position: relative;
+            overflow: hidden;
         }
 
-        .image-glow {
+        .member-icon::after {
+            content: '';
+            position: absolute;
+            width: 150%;
+            height: 150%;
+            background: linear-gradient(45deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+            transform: rotate(45deg);
+            animation: shine 3s infinite;
+        }
+
+        @keyframes shine {
+            0% { transform: translateX(-100%) rotate(45deg); }
+            100% { transform: translateX(100%) rotate(45deg); }
+        }
+
+        .member-card:hover .member-icon {
+            transform: translateZ(20px) scale(1.1);
+        }
+
+        .member-icon i {
+            font-size: 2.5rem;
+            color: white;
+            position: relative;
+            z-index: 1;
+        }
+
+        .topic-card {
+            background: rgba(30, 41, 59, 0.3);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            transition: all 0.3s ease;
+            padding: 1.5rem;
+            border-radius: 1rem;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .topic-card::before {
+            content: '';
             position: absolute;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
-            border-radius: 50%;
-            background: radial-gradient(circle at 50% 50%, rgba(96, 165, 250, 0.2), transparent 70%);
-            opacity: 0;
-            transition: opacity 0.3s ease;
+            background: linear-gradient(45deg, transparent, rgba(255, 255, 255, 0.1), transparent);
+            transform: translateX(-100%);
+            transition: 0.5s;
         }
 
-        .presenter-card:hover .image-glow {
-            opacity: 1;
+        .topic-card:hover::before {
+            transform: translateX(100%);
+        }
+
+        .topic-card:hover {
+            transform: translateY(-5px);
+            border-color: rgba(96, 165, 250, 0.2);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
         }
 
         .bg-pattern {
@@ -120,6 +175,15 @@
             overflow: hidden;
             transition: all 0.3s ease;
             border: 1px solid rgba(255, 255, 255, 0.1);
+            background: linear-gradient(45deg, #60a5fa, #818cf8, #c084fc);
+            background-size: 200% 200%;
+            animation: gradientBG 3s ease infinite;
+        }
+
+        @keyframes gradientBG {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
         }
 
         .start-button::before {
@@ -142,91 +206,6 @@
             left: 100%;
         }
 
-        .floating-shapes {
-            position: fixed;
-            width: 100%;
-            height: 100%;
-            pointer-events: none;
-            z-index: 0;
-        }
-
-        .shape {
-            position: absolute;
-            background: linear-gradient(45deg, rgba(96, 165, 250, 0.1), rgba(192, 132, 252, 0.1));
-            border-radius: 50%;
-            animation: float 20s infinite linear;
-        }
-
-        @keyframes float {
-            0% { transform: translate(0, 0) rotate(0deg); }
-            100% { transform: translate(100px, 100px) rotate(360deg); }
-        }
-
-        .card-content {
-            transform-style: preserve-3d;
-            transition: transform 0.5s ease;
-        }
-
-        .presenter-card:hover .card-content {
-            transform: translateZ(30px);
-        }
-
-        .role-badge {
-            background: rgba(96, 165, 250, 0.1);
-            border: 1px solid rgba(96, 165, 250, 0.2);
-            border-radius: 20px;
-            padding: 4px 12px;
-            font-size: 0.85rem;
-            color: #60a5fa;
-            display: inline-block;
-            margin-bottom: 8px;
-            transition: all 0.3s ease;
-        }
-
-        .presenter-card:hover .role-badge {
-            background: rgba(96, 165, 250, 0.2);
-            transform: translateZ(40px);
-        }
-
-        .achievements-text {
-            position: relative;
-            padding: 12px;
-            background: rgba(255, 255, 255, 0.03);
-            border-radius: 8px;
-            margin-top: 12px;
-            transition: all 0.3s ease;
-        }
-
-        .presenter-card:hover .achievements-text {
-            background: rgba(255, 255, 255, 0.05);
-            transform: translateZ(20px);
-        }
-
-        .title-text {
-            font-size: 3.5rem !important;
-            line-height: 1.2;
-            margin-bottom: 0.5rem !important;
-        }
-
-        .subtitle-text {
-            font-size: 1.25rem !important;
-            line-height: 1.5;
-            margin-bottom: 1.5rem !important;
-        }
-
-        .presenter-name {
-            font-size: 1.25rem !important;
-            margin-bottom: 0.25rem !important;
-        }
-
-        .presenter-role {
-            font-size: 0.875rem !important;
-        }
-
-        .presenter-experience {
-            font-size: 0.875rem !important;
-        }
-
         .container {
             max-height: 100vh;
             padding: 1.5rem;
@@ -235,12 +214,56 @@
             justify-content: space-between;
         }
 
-        .presenters-grid {
-            gap: 1rem !important;
+        .presented-to {
+            background: rgba(96, 165, 250, 0.1);
+            border: 1px solid rgba(96, 165, 250, 0.2);
+            padding: 0.5rem 1rem;
+            border-radius: 2rem;
+            font-size: 0.9rem;
+            color: #60a5fa;
+            display: inline-block;
+            margin-top: 1rem;
+            position: relative;
+            overflow: hidden;
         }
 
-        .presenter-card {
-            padding: 1rem !important;
+        .presented-to::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(45deg, transparent, rgba(255, 255, 255, 0.1), transparent);
+            transform: translateX(-100%);
+            transition: 0.5s;
+        }
+
+        .presented-to:hover::before {
+            transform: translateX(100%);
+        }
+
+        .floating-particles {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: -1;
+        }
+
+        .particle {
+            position: absolute;
+            background: linear-gradient(45deg, #60a5fa, #818cf8);
+            border-radius: 50%;
+            opacity: 0.1;
+            animation: float 20s infinite linear;
+        }
+
+        @keyframes float {
+            0% { transform: translate(0, 0) rotate(0deg); }
+            100% { transform: translate(100px, 100px) rotate(360deg); }
         }
     </style>
 </head>
@@ -251,20 +274,20 @@
     <script type="text/babel">
         const { motion, AnimatePresence } = window.Motion;
 
-        function FloatingShapes() {
+        function FloatingParticles() {
             return (
-                <div className="floating-shapes">
-                    {[1, 2, 3, 4, 5].map((i) => (
-                        <div 
+                <div className="floating-particles">
+                    {[...Array(20)].map((_, i) => (
+                        <div
                             key={i}
-                            className="shape"
+                            className="particle"
                             style={{
-                                width: `${Math.random() * 200 + 50}px`,
-                                height: `${Math.random() * 200 + 50}px`,
+                                width: `${Math.random() * 10 + 5}px`,
+                                height: `${Math.random() * 10 + 5}px`,
                                 left: `${Math.random() * 100}%`,
                                 top: `${Math.random() * 100}%`,
-                                animationDelay: `${i * -5}s`,
-                                opacity: 0.1
+                                animationDelay: `${i * -1}s`,
+                                animationDuration: `${Math.random() * 10 + 10}s`
                             }}
                         />
                     ))}
@@ -273,27 +296,44 @@
         }
 
         function IntroPage() {
-            const presenters = [
+            const topics = [
                 {
-                    name: "Dr. Sarah Johnson",
-                    role: "Mental Health Specialist",
-                    experience: "15+ years in psychiatric nursing",
-                    achievements: "Published researcher in resilience studies",
-                    image: "https://randomuser.me/api/portraits/women/1.jpg"
+                    title: "Resilience",
+                    icon: "ph-heart",
+                    link: "presentation.html"
                 },
                 {
-                    name: "Prof. Michael Chen",
-                    role: "Clinical Psychology Expert",
-                    experience: "20+ years in mental health education",
-                    achievements: "Author of 'Building Resilience in Healthcare'",
-                    image: "https://randomuser.me/api/portraits/men/2.jpg"
+                    title: "Complementary Therapies",
+                    icon: "ph-sparkle",
+                    link: "Complementary-presentation.html"
                 },
                 {
-                    name: "Dr. Emily Williams",
-                    role: "Nursing Education Director",
-                    experience: "12+ years in nurse training",
-                    achievements: "Developer of resilience training programs",
-                    image: "https://randomuser.me/api/portraits/women/3.jpg"
+                    title: "Cultural Diversity",
+                    icon: "ph-globe",
+                    link: "Cultural.html"
+                }
+            ];
+
+            const members = [
+                {
+                    name: "Haiqa Ahmad",
+                    icon: "ph-user"
+                },
+                {
+                    name: "Hayat Yousaf",
+                    icon: "ph-user"
+                },
+                {
+                    name: "Ayesha Nayab",
+                    icon: "ph-user"
+                },
+                {
+                    name: "Amina Maryam",
+                    icon: "ph-user"
+                },
+                {
+                    name: "Tayyaba Jabeen",
+                    icon: "ph-user"
                 }
             ];
 
@@ -303,7 +343,7 @@
 
             return (
                 <div className="container">
-                    <FloatingShapes />
+                    <FloatingParticles />
                     <motion.div
                         initial={{ opacity: 0, y: 20 }}
                         animate={{ opacity: 1, y: 0 }}
@@ -311,66 +351,83 @@
                         className="text-center mb-6"
                     >
                         <motion.h1 
-                            className="title-text font-bold title-font"
+                            className="text-5xl font-bold title-font mb-4"
                             initial={{ scale: 0.9, opacity: 0 }}
                             animate={{ scale: 1, opacity: 1 }}
                             transition={{ delay: 0.3, duration: 0.8, ease: "easeOut" }}
                         >
-                            <span className="gradient-text">Resilience</span> in
-                            <br />Mental Health Nursing
+                            <span className="gradient-text">Mental Health Nursing</span>
+                            <br />Presentation
                         </motion.h1>
-                        <motion.p 
-                            className="subtitle-text text-gray-400 max-w-3xl mx-auto"
-                            initial={{ opacity: 0, y: 20 }}
-                            animate={{ opacity: 1, y: 0 }}
-                            transition={{ delay: 0.6, duration: 0.8 }}
+                        <motion.div 
+                            className="presented-to"
+                            initial={{ opacity: 0 }}
+                            animate={{ opacity: 1 }}
+                            transition={{ delay: 0.6 }}
                         >
-                            A comprehensive exploration of building and maintaining resilience 
-                            in the challenging field of mental health nursing.
-                        </motion.p>
+                            Presented to: Mam Maryam Javed
+                        </motion.div>
                     </motion.div>
 
                     <motion.div 
-                        className="presenters-grid grid grid-cols-3 gap-4 max-w-6xl mx-auto mb-6"
+                        className="grid grid-cols-3 gap-4 max-w-4xl mx-auto mb-6"
                         initial={{ opacity: 0 }}
                         animate={{ opacity: 1 }}
                         transition={{ delay: 0.9 }}
                     >
-                        {presenters.map((presenter, index) => (
+                        {topics.map((topic, index) => (
                             <motion.div
-                                key={presenter.name}
-                                className="presenter-card rounded-xl"
+                                key={topic.title}
+                                className="topic-card text-center"
                                 initial={{ opacity: 0, y: 20 }}
                                 animate={{ opacity: 1, y: 0 }}
                                 transition={{ delay: 1.2 + (index * 0.2) }}
+                                whileHover={{ scale: 1.05 }}
                             >
-                                <div className="card-content">
-                                    <div className="presenter-image-container mb-3">
-                                        <motion.img
-                                            src={presenter.image}
-                                            alt={presenter.name}
-                                            className="presenter-image mx-auto object-cover rounded-full"
-                                            whileHover={{ scale: 1.05 }}
-                                        />
-                                        <div className="image-glow"></div>
-                                    </div>
-                                    <span className="role-badge text-xs">{presenter.role}</span>
-                                    <h3 className="presenter-name gradient-text">{presenter.name}</h3>
-                                    <p className="presenter-experience text-blue-300">{presenter.experience}</p>
-                                    <div className="achievements-text">
-                                        <p className="text-gray-400">{presenter.achievements}</p>
-                                    </div>
-                                </div>
+                                <i className={`ph ${topic.icon} text-4xl mb-3 text-blue-400`}></i>
+                                <h3 className="text-lg font-semibold">{topic.title}</h3>
                             </motion.div>
                         ))}
                     </motion.div>
 
+                    <motion.div 
+                        className="grid grid-cols-5 gap-4 max-w-6xl mx-auto mb-6"
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        transition={{ delay: 1.5 }}
+                    >
+                        {members.map((member, index) => (
+                            <motion.div
+                                key={member.name}
+                                className="member-card rounded-xl p-4 text-center"
+                                initial={{ opacity: 0, y: 20 }}
+                                animate={{ opacity: 1, y: 0 }}
+                                transition={{ delay: 1.8 + (index * 0.2) }}
+                                whileHover={{ scale: 1.05 }}
+                            >
+                                <div className="member-icon mb-3">
+                                    <i className={`ph ${member.icon}`}></i>
+                                </div>
+                                <h3 className="text-sm font-medium">{member.name}</h3>
+                            </motion.div>
+                        ))}
+                    </motion.div>
+
+                    <motion.div
+                        className="text-center mb-4"
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        transition={{ delay: 2.4 }}
+                    >
+                        <span className="text-blue-400 font-medium text-lg">Group 10</span>
+                    </motion.div>
+
                     <motion.button
                         onClick={handleStartPresentation}
-                        className="start-button px-8 py-3 rounded-full text-white text-lg font-medium bg-gradient-to-r from-blue-500 via-indigo-500 to-purple-500 mx-auto"
+                        className="start-button px-8 py-3 rounded-full text-white text-lg font-medium mx-auto"
                         initial={{ opacity: 0, scale: 0.9 }}
                         animate={{ opacity: 1, scale: 1 }}
-                        transition={{ delay: 1.8 }}
+                        transition={{ delay: 2.7 }}
                         whileHover={{ 
                             scale: 1.05,
                             boxShadow: "0 20px 40px rgba(96, 165, 250, 0.3)"
